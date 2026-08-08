@@ -1,0 +1,5 @@
+[install]
+saveTextLockfile = true
+
+# Refuse packages published less than 24 hours ago unless explicitly reviewed.
+minimumReleaseAge = 86400

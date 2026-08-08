@@ -1,0 +1,106 @@
+/**
+ * Permission keys taken from the API documentation's frontend permission map.
+ * Tab keys drive navigation visibility, action keys gate controls.
+ */
+
+export const TAB = {
+  dashboard: "dashboard.tab.view",
+  pos: "pos.tab.view",
+  orders: "orders.tab.view",
+  invoices: "invoices.tab.view",
+  sales: "sales.tab.view",
+  products: "products.tab.view",
+  brands: "brands.tab.view",
+  categories: "categories.tab.view",
+  attributes: "attributes.tab.view",
+  attributeValues: "attributeValues.tab.view",
+  stock: "stock.tab.view",
+  stockTransfer: "stockTransfer.tab.view",
+  stockMovement: "stockMovement.tab.view",
+  employees: "employees.tab.view",
+  customers: "customers.tab.view",
+  delivery: "delivery.tab.view",
+  expenses: "expenses.tab.view",
+  branches: "branches.tab.view",
+  users: "users.tab.view",
+  reports: "reports.tab.view",
+} as const;
+
+export const PERM = {
+  posAccess: "pos.access",
+  orderView: "order.view",
+  orderCreate: "order.create",
+  invoiceView: "invoice.view",
+  invoicePaymentAdd: "invoice.payment.add",
+  invoiceCreate: "invoice.create",
+  customerView: "customer.view",
+  customerCreate: "customer.create",
+  customerUpdate: "customer.update",
+  customerDelete: "customer.delete",
+  employeeView: "employee.view",
+  employeeCreate: "employee.create",
+  employeeUpdate: "employee.update",
+  employeeDelete: "employee.delete",
+  brandView: "brand.view",
+  brandCreate: "brand.create",
+  brandUpdate: "brand.update",
+  brandDelete: "brand.delete",
+  categoryView: "category.view",
+  categoryCreate: "category.create",
+  categoryUpdate: "category.update",
+  categoryDelete: "category.delete",
+  attributeView: "attribute.view",
+  attributeCreate: "attribute.create",
+  attributeUpdate: "attribute.update",
+  attributeDelete: "attribute.delete",
+  attributeValueCreate: "attributeValue.create",
+  attributeValueUpdate: "attributeValue.update",
+  attributeValueDelete: "attributeValue.delete",
+  productView: "product.view",
+  productCreate: "product.create",
+  productUpdate: "product.update",
+  productDelete: "product.delete",
+  variantView: "variant.view",
+  variantCreate: "variant.create",
+  variantUpdate: "variant.update",
+  variantDelete: "variant.delete",
+  saleView: "sale.view",
+  saleCreate: "sale.create",
+  saleUpdate: "sale.update",
+  saleDelete: "sale.delete",
+  deliveryChargeView: "deliveryCharge.view",
+  deliveryChargeCreate: "deliveryCharge.create",
+  deliveryChargeUpdate: "deliveryCharge.update",
+  deliveryChargeDelete: "deliveryCharge.delete",
+  expenseView: "expense.view",
+  expenseCreate: "expense.create",
+  expenseDecisionSubmit: "expenseDecision.submit",
+  branchView: "branch.view",
+  branchCreate: "branch.create",
+  branchUpdate: "branch.update",
+  branchDelete: "branch.delete",
+  usersView: "users.view",
+  usersCreate: "users.create",
+  usersUpdate: "users.update",
+  usersDelete: "users.delete",
+  stockView: "stock.view",
+  stockRestock: "stock.restock",
+  stockReduce: "stock.reduce",
+  stockMovementView: "stockMovement.view",
+  transferView: "stockTransfer.view",
+  transferRequest: "stockTransfer.request",
+  transferSend: "stockTransfer.send",
+  transferReceive: "stockTransfer.receive",
+  transferCancel: "stockTransfer.cancel",
+  transferResolve: "stockTransfer.resolve",
+} as const;
+
+export type PermissionKey = string;
+
+export function makePermissionChecker(permissions: readonly string[]) {
+  const set = new Set(permissions);
+  return (key: PermissionKey | PermissionKey[]): boolean => {
+    const keys = Array.isArray(key) ? key : [key];
+    return keys.some((candidate) => set.has(candidate));
+  };
+}
