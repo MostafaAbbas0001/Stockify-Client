@@ -5,21 +5,34 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+
     image: stockify-client:latest
     container_name: stockify-client
     restart: unless-stopped
+
     environment:
       NODE_ENV: production
       NITRO_HOST: 0.0.0.0
       NITRO_PORT: 3000
-      STOCKIFY_API_URL: ${DOCKER_STOCKIFY_API_URL:-http://host.docker.internal:5042}
+      STOCKIFY_API_URL: http://server:8080
+
     ports:
       - "${STOCKIFY_CLIENT_PORT:-3000}:3000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+
+    networks:
+      - stockify-network
+
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ >/dev/null || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://127.0.0.1:3000/ >/dev/null || exit 1"
+        ]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 15s
+
+networks:
+  stockify-network:
+    external: true
