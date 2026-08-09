@@ -3,10 +3,10 @@
 FROM node:22-alpine AS dependencies
 WORKDIR /app
 
-# Copy whichever npm metadata is available. Older deployments may not contain
-# package-lock.json; once present, npm ci keeps installs deterministic.
+# npm install uses the lockfile when present while repairing platform-specific
+# optional dependencies omitted when the lockfile was generated on Windows.
 COPY package*.json ./
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+RUN npm install --include=optional --no-audit --no-fund
 
 FROM node:22-alpine AS build
 WORKDIR /app
