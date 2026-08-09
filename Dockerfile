@@ -3,8 +3,10 @@
 FROM node:22-alpine AS dependencies
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+# Copy whichever npm metadata is available. Older deployments may not contain
+# package-lock.json; once present, npm ci keeps installs deterministic.
+COPY package*.json ./
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 FROM node:22-alpine AS build
 WORKDIR /app
