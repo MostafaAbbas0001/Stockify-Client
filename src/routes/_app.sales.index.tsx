@@ -4,13 +4,14 @@ import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
 import { Pagination } from "@/components/common/Pagination";
 import { RequirePermission } from "@/components/common/RequirePermission";
 import { SearchInput } from "@/components/common/SearchInput";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
+import { Card, CardHeader, PageHeader, TableShell, Td, Th } from "@/components/common/Surface";
 import {
   Dialog,
   DialogContent,
@@ -48,17 +49,6 @@ export const Route = createFileRoute("/_app/sales/")({
     from: typeof raw["from"] === "string" && raw["from"] ? raw["from"] : undefined,
     to: typeof raw["to"] === "string" && raw["to"] ? raw["to"] : undefined,
     page: Math.max(1, Number(raw["page"]) || 1),
-  }),
-  head: () => ({
-    meta: [
-      { title: "Promotions — Stockify" },
-      {
-        name: "description",
-        content: "Schedule and manage percentage or fixed-amount promotions in Stockify.",
-      },
-      { property: "og:title", content: "Promotions — Stockify" },
-      { property: "og:description", content: "Promotion campaign management in Stockify." },
-    ],
   }),
   component: SalesRoute,
 });
@@ -165,23 +155,23 @@ function SalesScreen() {
   );
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold">{t("sales.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("sales.subtitle")}</p>
-        </div>
-        {can(PERM.saleCreate) && (
-          <button
-            type="button"
-            onClick={() => openForm(null)}
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground"
-          >
-            <Plus className="size-4" />
-            {t("sales.newSale")}
-          </button>
-        )}
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title={t("sales.title")}
+        description={t("sales.subtitle")}
+        actions={
+          can(PERM.saleCreate) && (
+            <button
+              type="button"
+              onClick={() => openForm(null)}
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground"
+            >
+              <Plus className="size-4" />
+              {t("sales.newSale")}
+            </button>
+          )
+        }
+      />
       <Card>
         <CardHeader
           title={t("common.search")}
@@ -193,7 +183,7 @@ function SalesScreen() {
                 placeholder={t("sales.searchPlaceholder")}
                 className="min-w-56"
               />
-              <select
+              <AppSelect
                 value={filters.type ?? ""}
                 onChange={(event) =>
                   setFilters({
@@ -207,8 +197,8 @@ function SalesScreen() {
                 <option value="">{t("common.all")}</option>
                 <option value="1">{t("sales.percentage")}</option>
                 <option value="2">{t("sales.fixedAmount")}</option>
-              </select>
-              <select
+              </AppSelect>
+              <AppSelect
                 value={filters.active ?? ""}
                 onChange={(event) =>
                   setFilters({
@@ -223,7 +213,7 @@ function SalesScreen() {
                 <option value="">{t("common.all")}</option>
                 <option value="yes">{t("sales.active")}</option>
                 <option value="no">{t("sales.inactive")}</option>
-              </select>
+              </AppSelect>
               <input
                 type="date"
                 value={filters.from ?? ""}
@@ -293,7 +283,7 @@ function SalesScreen() {
                             type="button"
                             aria-label={t("common.edit")}
                             onClick={() => openForm(row)}
-                            className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-muted"
+                            className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                           >
                             <Pencil className="size-3.5" />
                           </button>
@@ -306,7 +296,7 @@ function SalesScreen() {
                               setDeleteError(null);
                               setDeleting(row);
                             }}
-                            className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-error-soft hover:text-destructive"
+                            className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-destructive"
                           >
                             <Trash2 className="size-3.5" />
                           </button>
@@ -371,14 +361,14 @@ function SalesScreen() {
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="space-y-1">
                 <span className="text-xs font-medium">{t("sales.type")}</span>
-                <select
+                <AppSelect
                   value={type}
                   onChange={(event) => setType(Number(event.target.value) as SaleTypeValue)}
                   className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
                 >
                   <option value="1">{t("sales.percentage")}</option>
                   <option value="2">{t("sales.fixedAmount")}</option>
-                </select>
+                </AppSelect>
               </label>
               <label className="space-y-1">
                 <span className="text-xs font-medium">{t("sales.value")}</span>

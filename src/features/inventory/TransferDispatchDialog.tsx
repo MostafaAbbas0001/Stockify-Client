@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { LoadingState } from "@/components/common/DataStates";
 import { branchesQuery } from "@/features/reference/queries";
 import { useI18n } from "@/i18n";
@@ -140,7 +141,7 @@ export function TransferDispatchDialog({
 
         <label className="block space-y-1">
           <span className="text-xs font-medium text-foreground">{t("transfers.source")}</span>
-          <select
+          <AppSelect
             value={sourceBranchId ?? ""}
             disabled={Boolean(transfer.sourceBranchId)}
             onChange={(event) => {
@@ -157,7 +158,7 @@ export function TransferDispatchDialog({
                   {branch.name}
                 </option>
               ))}
-          </select>
+          </AppSelect>
         </label>
 
         {!sourceBranchId ? null : lots.isPending ? (
@@ -206,9 +207,7 @@ export function TransferDispatchDialog({
                           >
                             <div className="min-w-0 flex-1">
                               <p className="font-numeric truncate text-xs text-foreground">
-                                {lot.isInternal
-                                  ? t("stock.internalLot")
-                                  : (lot.lotNumber ?? `#${lot.id}`)}
+                                {lot.lotNumber}
                               </p>
                               <p className="text-[0.7rem] text-muted-foreground">
                                 {t("transfers.available")}: {formatNumber(available, locale)}

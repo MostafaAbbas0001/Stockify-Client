@@ -4,8 +4,9 @@ import { KeyRound, Laptop, Loader2, ShieldCheck, UserRound } from "lucide-react"
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { ErrorState } from "@/components/common/DataStates";
-import { Card, CardHeader, KeyValue } from "@/components/common/Surface";
+import { Card, CardHeader, KeyValue, PageHeader } from "@/components/common/Surface";
 import { useTheme, type ThemeMode } from "@/components/theme/ThemeProvider";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { PERM } from "@/features/auth/permissions";
@@ -16,17 +17,6 @@ import { loadSession } from "@/lib/api/client";
 import { formatDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/_app/profile")({
-  head: () => ({
-    meta: [
-      { title: "Profile & Settings — Stockify" },
-      {
-        name: "description",
-        content: "Manage your Stockify password, language, theme and session preferences.",
-      },
-      { property: "og:title", content: "Profile & Settings — Stockify" },
-      { property: "og:description", content: "Personal Stockify workspace settings." },
-    ],
-  }),
   component: ProfileScreen,
 });
 function ProfileScreen() {
@@ -61,11 +51,8 @@ function ProfileScreen() {
   });
   const session = loadSession();
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-lg font-semibold">{t("profile.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("profile.subtitle")}</p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader title={t("profile.title")} description={t("profile.subtitle")} />
       <div className="grid gap-4 xl:grid-cols-2">
         <Card>
           <CardHeader title={t("profile.account")} />
@@ -80,18 +67,18 @@ function ProfileScreen() {
           <div className="grid gap-4 p-4 sm:grid-cols-2">
             <label className="space-y-1">
               <span className="text-xs font-medium">{t("common.language")}</span>
-              <select
+              <AppSelect
                 value={locale}
                 onChange={(event) => setLocale(event.target.value as Locale)}
                 className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
               >
                 <option value="en">English</option>
                 <option value="ar">العربية</option>
-              </select>
+              </AppSelect>
             </label>
             <label className="space-y-1">
               <span className="text-xs font-medium">{t("common.theme")}</span>
-              <select
+              <AppSelect
                 value={mode}
                 onChange={(event) => setMode(event.target.value as ThemeMode)}
                 className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
@@ -99,7 +86,7 @@ function ProfileScreen() {
                 <option value="system">{t("common.themeSystem")}</option>
                 <option value="light">{t("common.themeLight")}</option>
                 <option value="dark">{t("common.themeDark")}</option>
-              </select>
+              </AppSelect>
             </label>
           </div>
         </Card>
@@ -199,9 +186,7 @@ function IconValue({
 }) {
   return (
     <div className="flex gap-3">
-      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
-        <Icon className="size-4" />
-      </span>
+      <Icon className="mt-0.5 size-5 shrink-0 text-primary" />
       <div className="min-w-0">
         <p className="text-xs text-muted-foreground">{label}</p>
         <p className="truncate text-sm font-medium">{value}</p>

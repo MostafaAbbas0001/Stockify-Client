@@ -7,20 +7,6 @@ import { useI18n } from "@/i18n";
 import { brandsApi } from "@/lib/api/endpoints";
 
 export const Route = createFileRoute("/_app/brands/")({
-  head: () => ({
-    meta: [
-      { title: "Brands — Stockify" },
-      {
-        name: "description",
-        content:
-          "Manage the brands used across the Stockify catalog: create, rename and retire manufacturer labels.",
-      },
-      { property: "og:title", content: "Brands — Stockify" },
-      { property: "og:description", content: "Catalog brand management in Stockify." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
   component: BrandsRoute,
 });
 

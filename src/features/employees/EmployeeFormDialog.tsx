@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { AppSelect } from "@/components/common/AppSelect";
 import { branchesQuery } from "@/features/reference/queries";
 import { useI18n } from "@/i18n";
 import { employeesApi } from "@/lib/api/endpoints";
@@ -128,7 +129,7 @@ export function EmployeeFormDialog({
 
           <label className="block space-y-1">
             <span className="text-xs font-medium text-foreground">{t("common.branch")}</span>
-            <select
+            <AppSelect
               value={branchId ?? ""}
               onChange={(event) => setBranchId(Number(event.target.value) || null)}
               className="h-10 w-full rounded-lg border border-input bg-background px-2 text-sm outline-none focus:border-ring"
@@ -139,7 +140,7 @@ export function EmployeeFormDialog({
                   {branch.name}
                 </option>
               ))}
-            </select>
+            </AppSelect>
             {fieldErrors["branchId"] && (
               <span className="block text-[0.7rem] text-destructive">
                 {fieldErrors["branchId"]}

@@ -10,10 +10,8 @@ import { useI18n } from "@/i18n";
 /**
  * Pathless layout that gates every in-app screen behind a session and renders
  * the persistent application shell (sidebar + header) around every child route.
- * ssr:false because the session lives in browser storage.
  */
 export const Route = createFileRoute("/_app")({
-  ssr: false,
   component: AppLayout,
 });
 

@@ -5,7 +5,8 @@ import { toast } from "sonner";
 
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
-import { Card, CardHeader } from "@/components/common/Surface";
+import { FormDialog } from "@/components/common/FormDialog";
+import { Card, CardHeader, PageHeader } from "@/components/common/Surface";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { PERM } from "@/features/auth/permissions";
 import { useI18n } from "@/i18n";
@@ -96,23 +97,23 @@ export function AttributesScreen() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-lg font-semibold text-foreground">{t("attributes.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("attributes.subtitle")}</p>
-        </div>
-        {can(PERM.attributeCreate) && (
-          <button
-            type="button"
-            onClick={() => openForm(null)}
-            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-          >
-            <Plus className="size-4" />
-            {t("attributes.newAttribute")}
-          </button>
-        )}
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title={t("attributes.title")}
+        description={t("attributes.subtitle")}
+        actions={
+          can(PERM.attributeCreate) && (
+            <button
+              type="button"
+              onClick={() => openForm(null)}
+              className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="size-4" />
+              {t("attributes.newAttribute")}
+            </button>
+          )
+        }
+      />
 
       {list.isPending ? (
         <Card>
@@ -153,74 +154,72 @@ export function AttributesScreen() {
         </div>
       )}
 
-      {formOpen && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/40 p-4 backdrop-blur-sm">
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              setFormError(null);
-              if (!name.trim()) {
-                setFormError(t("common.required"));
-                return;
-              }
-              save.mutate();
-            }}
-            className="w-full max-w-md space-y-3 rounded-xl border border-border bg-card p-5 shadow-xl"
-            noValidate
-          >
-            <h3 className="text-sm font-semibold text-foreground">
-              {editing ? t("attributes.editAttribute") : t("attributes.newAttribute")}
-            </h3>
-            {formError && (
-              <p className="rounded-lg border border-destructive/25 bg-error-soft px-3 py-2 text-xs text-destructive">
-                {formError}
-              </p>
-            )}
-            <label className="block space-y-1">
-              <span className="text-xs font-medium text-foreground">{t("common.name")}</span>
-              <input
-                autoFocus
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
-              />
-            </label>
-            {!editing && (
-              <label className="block space-y-1">
-                <span className="text-xs font-medium text-foreground">
-                  {t("attributes.initialValues")}
-                </span>
-                <textarea
-                  rows={5}
-                  value={valuesText}
-                  onChange={(event) => setValuesText(event.target.value)}
-                  className="w-full rounded-lg border border-input bg-background p-3 text-sm outline-none focus:border-ring"
-                />
-                <span className="block text-[0.7rem] text-muted-foreground">
-                  {t("attributes.initialValuesHint")}
-                </span>
-              </label>
-            )}
-            <div className="flex gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => setFormOpen(false)}
-                className="h-10 flex-1 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted"
-              >
-                {t("common.cancel")}
-              </button>
-              <button
-                type="submit"
-                disabled={save.isPending}
-                className="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-              >
-                {save.isPending && <Loader2 className="size-4 animate-spin" />}
-                {t("common.save")}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+      <FormDialog
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        pending={save.isPending}
+        title={editing ? t("attributes.editAttribute") : t("attributes.newAttribute")}
+        className="max-w-md"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setFormError(null);
+          if (!name.trim()) {
+            setFormError(t("common.required"));
+            return;
+          }
+          save.mutate();
+        }}
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => setFormOpen(false)}
+              className="h-10 flex-1 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted"
+            >
+              {t("common.cancel")}
+            </button>
+            <button
+              type="submit"
+              disabled={save.isPending}
+              className="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+            >
+              {save.isPending && <Loader2 className="size-4 animate-spin" />}
+              {t("common.save")}
+            </button>
+          </>
+        }
+      >
+        {formError && (
+          <p className="rounded-lg border border-destructive/25 bg-error-soft px-3 py-2 text-xs text-destructive">
+            {formError}
+          </p>
+        )}
+        <label className="block space-y-1">
+          <span className="text-xs font-medium text-foreground">{t("common.name")}</span>
+          <input
+            autoFocus
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
+          />
+        </label>
+        {!editing && (
+          <label className="block space-y-1">
+            <span className="text-xs font-medium text-foreground">
+              {t("attributes.initialValues")}
+            </span>
+            <textarea
+              rows={5}
+              value={valuesText}
+              onChange={(event) => setValuesText(event.target.value)}
+              className="w-full rounded-lg border border-input bg-background p-3 text-sm outline-none focus:border-ring"
+            />
+            <span className="block text-[0.7rem] text-muted-foreground">
+              {t("attributes.initialValuesHint")}
+            </span>
+          </label>
+        )}
+      </FormDialog>
 
       <ConfirmDialog
         open={Boolean(deleting)}
@@ -319,7 +318,7 @@ function AttributeCard({
                 type="button"
                 aria-label={t("common.edit")}
                 onClick={onEdit}
-                className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
               >
                 <Pencil className="size-3.5" />
               </button>
@@ -329,7 +328,7 @@ function AttributeCard({
                 type="button"
                 aria-label={t("common.delete")}
                 onClick={onDelete}
-                className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-error-soft hover:text-destructive"
+                className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-destructive"
               >
                 <Trash2 className="size-3.5" />
               </button>

@@ -54,7 +54,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onCancel}
             disabled={pending}
-            className="h-10 flex-1 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50"
+            className="h-11 flex-1 rounded-xl border border-border bg-background text-sm font-semibold text-foreground hover:bg-muted disabled:opacity-50"
           >
             {t("common.cancel")}
           </button>
@@ -63,7 +63,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             disabled={pending}
             className={cn(
-              "flex h-10 flex-1 items-center justify-center gap-2 rounded-lg text-sm font-semibold disabled:opacity-50",
+              "flex h-11 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-semibold shadow-sm disabled:opacity-50",
               tone === "destructive"
                 ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 : "bg-primary text-primary-foreground hover:bg-primary/90",

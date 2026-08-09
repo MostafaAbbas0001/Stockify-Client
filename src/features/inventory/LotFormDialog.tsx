@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { FormDialog } from "@/components/common/FormDialog";
 import { VariantPicker } from "@/features/inventory/VariantPicker";
 import { useI18n } from "@/i18n";
 import { inventoryLotsApi } from "@/lib/api/endpoints";
@@ -34,7 +35,7 @@ export function LotFormDialog({
     mutationFn: () =>
       inventoryLotsApi.create({
         variantId: variant?.id ?? 0,
-        lotNumber: lotNumber.trim() || null,
+        lotNumber: lotNumber.trim(),
         manufacturingDate: manufacturingDate || null,
         expiryDate: expiryDate || null,
       }),
@@ -57,94 +58,29 @@ export function LotFormDialog({
     },
   });
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-foreground/40 p-4 backdrop-blur-sm">
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          setFieldErrors({});
-          setFormError(null);
-          if (!variant) {
-            setFormError(t("stock.pickVariant"));
-            return;
-          }
-          save.mutate();
-        }}
-        className="my-auto w-full max-w-md space-y-3 rounded-xl border border-border bg-card p-5 shadow-xl"
-        noValidate
-      >
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="text-sm font-semibold text-foreground">{t("stock.newLot")}</h3>
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="text-xs font-medium text-muted-foreground hover:text-foreground"
-          >
-            {t("common.close")}
-          </button>
-        </div>
-
-        <p className="rounded-lg border border-border bg-surface-sunken px-3 py-2 text-xs text-muted-foreground">
-          {t("stock.lotCreateHint")}
-        </p>
-
-        {formError && (
-          <p className="rounded-lg border border-destructive/25 bg-error-soft px-3 py-2 text-xs text-destructive">
-            {formError}
-          </p>
-        )}
-
-        <VariantPicker
-          value={variant}
-          onChange={setVariant}
-          error={fieldErrors["variantId"] ?? null}
-        />
-
-        <label className="block space-y-1">
-          <span className="text-xs font-medium text-foreground">{t("stock.lotNumber")}</span>
-          <input
-            value={lotNumber}
-            onChange={(event) => setLotNumber(event.target.value)}
-            className="font-numeric h-10 w-full rounded-lg border border-input bg-background px-3 text-sm uppercase outline-none focus:border-ring"
-          />
-          {fieldErrors["lotNumber"] && (
-            <span className="block text-[0.7rem] text-destructive">{fieldErrors["lotNumber"]}</span>
-          )}
-        </label>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-foreground">
-              {t("stock.manufacturingDate")}
-            </span>
-            <input
-              type="date"
-              value={manufacturingDate}
-              onChange={(event) => setManufacturingDate(event.target.value)}
-              className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
-            />
-          </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-foreground">{t("stock.expiryDate")}</span>
-            <input
-              type="date"
-              value={expiryDate}
-              onChange={(event) => setExpiryDate(event.target.value)}
-              className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
-            />
-            {fieldErrors["expiryDate"] && (
-              <span className="block text-[0.7rem] text-destructive">
-                {fieldErrors["expiryDate"]}
-              </span>
-            )}
-          </label>
-        </div>
-
-        <p className="text-[0.7rem] text-muted-foreground">{t("stock.lotMetadataUntracked")}</p>
-
-        <div className="flex gap-2 pt-1">
+    <FormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      pending={save.isPending}
+      title={t("stock.newLot")}
+      className="max-w-md"
+      onSubmit={(event) => {
+        event.preventDefault();
+        setFieldErrors({});
+        setFormError(null);
+        if (!variant) {
+          setFormError(t("stock.pickVariant"));
+          return;
+        }
+        if (!lotNumber.trim()) {
+          setFieldErrors({ lotNumber: t("common.required") });
+          return;
+        }
+        save.mutate();
+      }}
+      actions={
+        <>
           <button
             type="button"
             onClick={() => onOpenChange(false)}
@@ -160,8 +96,64 @@ export function LotFormDialog({
             {save.isPending && <Loader2 className="size-4 animate-spin" />}
             {t("common.create")}
           </button>
-        </div>
-      </form>
-    </div>
+        </>
+      }
+    >
+      <p className="rounded-lg border border-border bg-surface-sunken px-3 py-2 text-xs text-muted-foreground">
+        {t("stock.lotCreateHint")}
+      </p>
+
+      {formError && (
+        <p className="rounded-lg border border-destructive/25 bg-error-soft px-3 py-2 text-xs text-destructive">
+          {formError}
+        </p>
+      )}
+
+      <VariantPicker
+        value={variant}
+        onChange={setVariant}
+        error={fieldErrors["variantId"] ?? null}
+      />
+
+      <label className="block space-y-1">
+        <span className="text-xs font-medium text-foreground">{t("stock.lotNumber")}</span>
+        <input
+          value={lotNumber}
+          onChange={(event) => setLotNumber(event.target.value)}
+          className="font-numeric h-10 w-full rounded-lg border border-input bg-background px-3 text-sm uppercase outline-none focus:border-ring"
+        />
+        {fieldErrors["lotNumber"] && (
+          <span className="block text-[0.7rem] text-destructive">{fieldErrors["lotNumber"]}</span>
+        )}
+      </label>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="block space-y-1">
+          <span className="text-xs font-medium text-foreground">
+            {t("stock.manufacturingDate")}
+          </span>
+          <input
+            type="date"
+            value={manufacturingDate}
+            onChange={(event) => setManufacturingDate(event.target.value)}
+            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="text-xs font-medium text-foreground">{t("stock.expiryDate")}</span>
+          <input
+            type="date"
+            value={expiryDate}
+            onChange={(event) => setExpiryDate(event.target.value)}
+            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
+          />
+          {fieldErrors["expiryDate"] && (
+            <span className="block text-[0.7rem] text-destructive">
+              {fieldErrors["expiryDate"]}
+            </span>
+          )}
+        </label>
+      </div>
+    </FormDialog>
   );
 }

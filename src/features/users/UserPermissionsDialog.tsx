@@ -16,7 +16,7 @@ import {
 import { useI18n } from "@/i18n";
 import { usersApi } from "@/lib/api/endpoints";
 import { isApiError } from "@/lib/api/errors";
-import type { UserRow } from "@/lib/api/types";
+import type { UserPermissionsResponse, UserRow } from "@/lib/api/types";
 
 export function UserPermissionsDialog({
   user,
@@ -44,7 +44,7 @@ export function UserPermissionsDialog({
   }, [permissions.data]);
 
   const groups = useMemo(() => {
-    const map = new Map<string, NonNullable<typeof permissions.data>["permissions"]>();
+    const map = new Map<string, UserPermissionsResponse["permissions"]>();
     for (const permission of permissions.data?.permissions ?? []) {
       const group =
         permission.key.split(".")[0] || permission.target || t("users.otherPermissions");

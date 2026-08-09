@@ -3,12 +3,13 @@ import { ChevronDown, Plus, Send, PackageCheck, Ban, ShieldCheck } from "lucide-
 import { Fragment, useState } from "react";
 import { toast } from "sonner";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
 import { Pagination } from "@/components/common/Pagination";
 import { SearchInput } from "@/components/common/SearchInput";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
+import { Card, CardHeader, PageHeader, TableShell, Td, Th } from "@/components/common/Surface";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { PERM } from "@/features/auth/permissions";
 import { TransferDispatchDialog } from "@/features/inventory/TransferDispatchDialog";
@@ -99,23 +100,23 @@ export function TransfersScreen() {
   const filtered = Boolean(search || branchId || statusId);
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-lg font-semibold text-foreground">{t("transfers.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("transfers.subtitle")}</p>
-        </div>
-        {can(PERM.transferRequest) && (
-          <button
-            type="button"
-            onClick={() => setCreating(true)}
-            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-          >
-            <Plus className="size-4" />
-            {t("transfers.newTransfer")}
-          </button>
-        )}
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title={t("transfers.title")}
+        description={t("transfers.subtitle")}
+        actions={
+          can(PERM.transferRequest) && (
+            <button
+              type="button"
+              onClick={() => setCreating(true)}
+              className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="size-4" />
+              {t("transfers.newTransfer")}
+            </button>
+          )
+        }
+      />
 
       <div className="grid gap-3 sm:grid-cols-3">
         <StatCard
@@ -160,7 +161,7 @@ export function TransfersScreen() {
                 placeholder={t("transfers.searchTransfers")}
                 className="min-w-56 flex-1"
               />
-              <select
+              <AppSelect
                 value={statusId ?? ""}
                 onChange={(event) => {
                   setStatusId(event.target.value ? Number(event.target.value) : null);
@@ -175,8 +176,8 @@ export function TransfersScreen() {
                     {t(transferStatusMeta(id)?.key ?? "")}
                   </option>
                 ))}
-              </select>
-              <select
+              </AppSelect>
+              <AppSelect
                 value={branchId ?? ""}
                 onChange={(event) => {
                   setBranchId(event.target.value ? Number(event.target.value) : null);
@@ -191,7 +192,7 @@ export function TransfersScreen() {
                     {branch.name}
                   </option>
                 ))}
-              </select>
+              </AppSelect>
             </div>
           }
         />
@@ -466,10 +467,8 @@ function IconAction({
       title={label}
       onClick={onClick}
       className={cn(
-        "grid size-8 place-items-center rounded-lg border border-border text-muted-foreground",
-        danger
-          ? "hover:bg-error-soft hover:text-destructive"
-          : "hover:bg-muted hover:text-foreground",
+        "grid size-8 place-items-center text-muted-foreground transition-colors",
+        danger ? "hover:text-destructive" : "hover:text-foreground",
       )}
     >
       {icon}

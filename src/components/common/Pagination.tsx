@@ -18,7 +18,7 @@ export function Pagination({
   if (totalCount === 0) return null;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3">
+    <div className="flex flex-col items-center justify-between gap-3 border-t border-border/70 px-4 py-4 sm:flex-row">
       <p className="text-xs text-muted-foreground">
         {formatNumber(totalCount, locale)} {t("common.results")}
       </p>
@@ -27,7 +27,7 @@ export function Pagination({
           type="button"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"
+          className="grid size-10 place-items-center text-muted-foreground transition-colors hover:text-primary disabled:opacity-40"
           aria-label={t("common.previous")}
         >
           <ChevronLeft className="size-4 rtl:rotate-180" />
@@ -40,7 +40,7 @@ export function Pagination({
           type="button"
           disabled={page >= totalPages}
           onClick={() => onPageChange(page + 1)}
-          className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"
+          className="grid size-10 place-items-center text-muted-foreground transition-colors hover:text-primary disabled:opacity-40"
           aria-label={t("common.next")}
         >
           <ChevronRight className="size-4 rtl:rotate-180" />

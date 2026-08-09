@@ -8,7 +8,7 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
 import { RequirePermission } from "@/components/common/RequirePermission";
 import { SearchInput } from "@/components/common/SearchInput";
-import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
+import { Card, CardHeader, PageHeader, TableShell, Td, Th } from "@/components/common/Surface";
 import {
   Dialog,
   DialogContent,
@@ -29,14 +29,6 @@ import { formatMoney } from "@/lib/format";
 export const Route = createFileRoute("/_app/delivery-charges/")({
   validateSearch: (raw: Record<string, unknown>): { q?: string | undefined } => ({
     q: typeof raw["q"] === "string" && raw["q"] ? raw["q"] : undefined,
-  }),
-  head: () => ({
-    meta: [
-      { title: "Delivery Charges — Stockify" },
-      { name: "description", content: "Manage delivery locations and checkout fees in Stockify." },
-      { property: "og:title", content: "Delivery Charges — Stockify" },
-      { property: "og:description", content: "Delivery location fee settings in Stockify." },
-    ],
   }),
   component: DeliveryChargesRoute,
 });
@@ -109,22 +101,22 @@ function DeliveryChargesScreen() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold text-foreground">{t("deliveryCharges.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("deliveryCharges.subtitle")}</p>
-        </div>
-        {can(PERM.deliveryChargeCreate) && (
-          <button
-            type="button"
-            onClick={() => openForm(null)}
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-          >
-            <Plus className="size-4" /> {t("deliveryCharges.newLocation")}
-          </button>
-        )}
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title={t("deliveryCharges.title")}
+        description={t("deliveryCharges.subtitle")}
+        actions={
+          can(PERM.deliveryChargeCreate) && (
+            <button
+              type="button"
+              onClick={() => openForm(null)}
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="size-4" /> {t("deliveryCharges.newLocation")}
+            </button>
+          )
+        }
+      />
 
       <Card>
         <CardHeader
@@ -173,7 +165,7 @@ function DeliveryChargesScreen() {
                           type="button"
                           aria-label={t("common.edit")}
                           onClick={() => openForm(row)}
-                          className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-muted"
+                          className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                         >
                           <Pencil className="size-3.5" />
                         </button>
@@ -186,7 +178,7 @@ function DeliveryChargesScreen() {
                             setDeleteError(null);
                             setDeleting(row);
                           }}
-                          className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-error-soft hover:text-destructive"
+                          className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-destructive"
                         >
                           <Trash2 className="size-3.5" />
                         </button>

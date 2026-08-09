@@ -3,6 +3,7 @@ import { Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { MoneyRow } from "@/components/common/Surface";
 import { currenciesQuery } from "@/features/reference/queries";
 import { useI18n } from "@/i18n";
@@ -147,7 +148,7 @@ export function InvoicePaymentDialog({
           </label>
           <label className="block space-y-1">
             <span className="text-xs font-medium text-foreground">{t("common.currency")}</span>
-            <select
+            <AppSelect
               value={effectiveCurrencyId ?? ""}
               onChange={(event) => setCurrencyId(Number(event.target.value))}
               className="h-10 w-full rounded-lg border border-input bg-background px-2 text-sm outline-none focus:border-ring"
@@ -157,7 +158,7 @@ export function InvoicePaymentDialog({
                   {item.code} — {item.name}
                 </option>
               ))}
-            </select>
+            </AppSelect>
           </label>
           {method === "Cash" ? (
             <label className="block space-y-1">

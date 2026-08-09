@@ -42,17 +42,16 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     labelKey: "nav.workspace",
     items: [
-      { labelKey: "nav.pos", to: "/pos", icon: ScanBarcode, tab: TAB.pos },
-      { labelKey: "nav.orders", to: "/orders", icon: ClipboardList, tab: TAB.orders },
-      { labelKey: "nav.invoices", to: "/invoices", icon: Receipt, tab: TAB.invoices },
       { labelKey: "nav.dashboard", to: "/dashboard", icon: Gauge, tab: TAB.dashboard },
+      { labelKey: "nav.pos", to: "/pos", icon: ScanBarcode, tab: TAB.pos },
     ],
   },
   {
-    labelKey: "nav.people",
+    labelKey: "nav.sales",
     items: [
-      { labelKey: "nav.customers", to: "/customers", icon: Contact, tab: TAB.customers },
-      { labelKey: "nav.employees", to: "/employees", icon: Users, tab: TAB.employees },
+      { labelKey: "nav.orders", to: "/orders", icon: ClipboardList, tab: TAB.orders },
+      { labelKey: "nav.invoices", to: "/invoices", icon: Receipt, tab: TAB.invoices },
+      { labelKey: "nav.sales", to: "/sales", icon: Percent, tab: TAB.sales },
     ],
   },
   {
@@ -62,7 +61,6 @@ export const NAV_SECTIONS: NavSection[] = [
       { labelKey: "nav.categories", to: "/categories", icon: LayoutGrid, tab: TAB.categories },
       { labelKey: "nav.brands", to: "/brands", icon: Layers, tab: TAB.brands },
       { labelKey: "nav.attributes", to: "/attributes", icon: Settings2, tab: TAB.attributes },
-      { labelKey: "nav.sales", to: "/sales", icon: Percent, tab: TAB.sales },
     ],
   },
   {
@@ -74,11 +72,18 @@ export const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
+    labelKey: "nav.people",
+    items: [
+      { labelKey: "nav.customers", to: "/customers", icon: Contact, tab: TAB.customers },
+      { labelKey: "nav.employees", to: "/employees", icon: Users, tab: TAB.employees },
+    ],
+  },
+  {
     labelKey: "nav.finance",
     items: [
       { labelKey: "nav.expenses", to: "/expenses", icon: Wallet, tab: TAB.expenses },
-      { labelKey: "nav.deliveryCharges", to: "/delivery-charges", icon: Truck, tab: TAB.delivery },
       { labelKey: "nav.reports", to: "/reports", icon: FileText, tab: TAB.reports },
+      { labelKey: "nav.deliveryCharges", to: "/delivery-charges", icon: Truck, tab: TAB.delivery },
     ],
   },
   {

@@ -2,12 +2,13 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
 import { Pagination } from "@/components/common/Pagination";
 import { RequirePermission } from "@/components/common/RequirePermission";
 import { SearchInput } from "@/components/common/SearchInput";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
+import { Card, CardHeader, PageHeader, TableShell, Td, Th } from "@/components/common/Surface";
 import { TAB } from "@/features/auth/permissions";
 import { useI18n } from "@/i18n";
 import { invoicesApi } from "@/lib/api/endpoints";
@@ -15,23 +16,6 @@ import { InvoiceStatus, invoiceStatusMeta } from "@/lib/enums";
 import { endOfDayIso, formatDateTime, formatMoney, startOfDayIso } from "@/lib/format";
 
 export const Route = createFileRoute("/_app/invoices/")({
-  head: () => ({
-    meta: [
-      { title: "Invoices — Stockify" },
-      {
-        name: "description",
-        content:
-          "Stockify accounts receivable: search invoices, track paid and outstanding balances by status and date.",
-      },
-      { property: "og:title", content: "Invoices — Stockify" },
-      {
-        property: "og:description",
-        content: "Invoice ledger with payments, balances and returns in Stockify.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
   component: InvoicesRoute,
 });
 
@@ -77,11 +61,8 @@ function InvoicesList() {
   const filtered = Boolean(search || statusId || start || end);
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-lg font-semibold text-foreground">{t("invoices.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("invoices.subtitle")}</p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader title={t("invoices.title")} description={t("invoices.subtitle")} />
 
       <Card>
         <CardHeader
@@ -97,7 +78,7 @@ function InvoicesList() {
                 placeholder={t("invoices.searchPlaceholder")}
                 className="min-w-64 flex-1"
               />
-              <select
+              <AppSelect
                 value={statusId ?? ""}
                 onChange={(event) => {
                   setStatusId(event.target.value ? Number(event.target.value) : null);
@@ -115,7 +96,7 @@ function InvoicesList() {
                     </option>
                   );
                 })}
-              </select>
+              </AppSelect>
               <input
                 type="date"
                 value={start}

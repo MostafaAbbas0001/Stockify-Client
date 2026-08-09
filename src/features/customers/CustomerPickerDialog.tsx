@@ -171,9 +171,7 @@ export function CustomerPickerDialog({
                         onClick={() => onSelect(customer)}
                         className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-start transition-colors hover:bg-muted"
                       >
-                        <span className="grid size-8 shrink-0 place-items-center rounded-md bg-primary-soft text-primary">
-                          <UserRound className="size-4" />
-                        </span>
+                        <UserRound className="size-5 shrink-0 text-primary" />
                         <span className="min-w-0">
                           <span className="block truncate text-sm font-medium text-foreground">
                             {customer.name}

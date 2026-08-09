@@ -4,12 +4,13 @@ import { KeyRound, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
 import { Pagination } from "@/components/common/Pagination";
 import { RequirePermission } from "@/components/common/RequirePermission";
 import { SearchInput } from "@/components/common/SearchInput";
-import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
+import { Card, CardHeader, PageHeader, TableShell, Td, Th } from "@/components/common/Surface";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { PERM, TAB } from "@/features/auth/permissions";
 import { branchesQuery, rolesQuery } from "@/features/reference/queries";
@@ -34,18 +35,6 @@ export const Route = createFileRoute("/_app/users/")({
     role: Number(raw["role"]) > 0 ? Number(raw["role"]) : undefined,
     branch: Number(raw["branch"]) > 0 ? Number(raw["branch"]) : undefined,
     page: Math.max(1, Number(raw["page"]) || 1),
-  }),
-  head: () => ({
-    meta: [
-      { title: "Users & Permissions — Stockify" },
-      {
-        name: "description",
-        content:
-          "Manage Stockify user accounts, roles, branches and effective permission overrides.",
-      },
-      { property: "og:title", content: "Users & Permissions — Stockify" },
-      { property: "og:description", content: "Account and permission administration in Stockify." },
-    ],
   }),
   component: UsersRoute,
 });
@@ -103,26 +92,26 @@ function UsersScreen() {
   });
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold">{t("users.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("users.subtitle")}</p>
-        </div>
-        {can(PERM.usersCreate) && (
-          <button
-            type="button"
-            onClick={() => {
-              setEditing(null);
-              setFormOpen(true);
-            }}
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground"
-          >
-            <Plus className="size-4" />
-            {t("users.newUser")}
-          </button>
-        )}
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title={t("users.title")}
+        description={t("users.subtitle")}
+        actions={
+          can(PERM.usersCreate) && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditing(null);
+                setFormOpen(true);
+              }}
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground"
+            >
+              <Plus className="size-4" />
+              {t("users.newUser")}
+            </button>
+          )
+        }
+      />
       <Card>
         <CardHeader
           title={t("common.search")}
@@ -134,7 +123,7 @@ function UsersScreen() {
                 placeholder={t("users.searchPlaceholder")}
                 className="min-w-56"
               />
-              <select
+              <AppSelect
                 value={filters.role ?? ""}
                 onChange={(event) =>
                   setFilters({ role: event.target.value ? Number(event.target.value) : undefined })
@@ -147,8 +136,8 @@ function UsersScreen() {
                     {role.name}
                   </option>
                 ))}
-              </select>
-              <select
+              </AppSelect>
+              <AppSelect
                 value={filters.branch ?? ""}
                 onChange={(event) =>
                   setFilters({
@@ -163,7 +152,7 @@ function UsersScreen() {
                     {branch.name}
                   </option>
                 ))}
-              </select>
+              </AppSelect>
             </div>
           }
         />
@@ -209,7 +198,7 @@ function UsersScreen() {
                               type="button"
                               aria-label={t("users.permissions")}
                               onClick={() => setPermissionsUser(row)}
-                              className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-muted"
+                              className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                             >
                               <KeyRound className="size-3.5" />
                             </button>
@@ -220,7 +209,7 @@ function UsersScreen() {
                                 setEditing(row);
                                 setFormOpen(true);
                               }}
-                              className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-muted"
+                              className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                             >
                               <Pencil className="size-3.5" />
                             </button>
@@ -234,7 +223,7 @@ function UsersScreen() {
                               setDeleteError(null);
                               setDeleting(row);
                             }}
-                            className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-error-soft hover:text-destructive"
+                            className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-destructive"
                           >
                             <Trash2 className="size-3.5" />
                           </button>

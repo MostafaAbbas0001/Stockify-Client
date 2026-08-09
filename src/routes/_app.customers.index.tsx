@@ -9,7 +9,7 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataSt
 import { Pagination } from "@/components/common/Pagination";
 import { RequirePermission } from "@/components/common/RequirePermission";
 import { SearchInput } from "@/components/common/SearchInput";
-import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
+import { Card, CardHeader, PageHeader, TableShell, Td, Th } from "@/components/common/Surface";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { PERM, TAB } from "@/features/auth/permissions";
 import { CustomerFormDialog } from "@/features/customers/CustomerFormDialog";
@@ -20,23 +20,6 @@ import type { Customer } from "@/lib/api/types";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_app/customers/")({
-  head: () => ({
-    meta: [
-      { title: "Customers — Stockify" },
-      {
-        name: "description",
-        content:
-          "Stockify customer directory: search contacts, add new customers and keep phone, email and address details current.",
-      },
-      { property: "og:title", content: "Customers — Stockify" },
-      {
-        property: "og:description",
-        content: "Manage the Stockify customer directory used at the point of sale.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
   component: CustomersRoute,
 });
 
@@ -82,26 +65,26 @@ function CustomersScreen() {
   const canDelete = can(PERM.customerDelete);
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold text-foreground">{t("customers.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("customers.subtitle")}</p>
-        </div>
-        {can(PERM.customerCreate) && (
-          <button
-            type="button"
-            onClick={() => {
-              setEditing(null);
-              setFormOpen(true);
-            }}
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-          >
-            <Plus className="size-4" />
-            {t("customers.newCustomer")}
-          </button>
-        )}
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title={t("customers.title")}
+        description={t("customers.subtitle")}
+        actions={
+          can(PERM.customerCreate) && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditing(null);
+                setFormOpen(true);
+              }}
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="size-4" />
+              {t("customers.newCustomer")}
+            </button>
+          )
+        }
+      />
 
       <Card>
         <CardHeader
@@ -171,7 +154,7 @@ function CustomersScreen() {
                                 setEditing(customer);
                                 setFormOpen(true);
                               }}
-                              className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                              className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                             >
                               <Pencil className="size-3.5" />
                             </button>
@@ -184,7 +167,7 @@ function CustomersScreen() {
                                 setDeleteError(null);
                                 setDeleting(customer);
                               }}
-                              className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-error-soft hover:text-destructive"
+                              className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-destructive"
                             >
                               <Trash2 className="size-3.5" />
                             </button>

@@ -6,25 +6,6 @@ import { firstPermittedRoute } from "@/components/layout/navigation";
 import { useAuth } from "@/features/auth/context/AuthContext";
 
 export const Route = createFileRoute("/")({
-  ssr: false,
-  head: () => ({
-    meta: [
-      { title: "Stockify — Retail POS, Inventory & Order Management" },
-      {
-        name: "description",
-        content:
-          "Stockify is the operations workspace for multi-branch retail: fast point of sale, order fulfilment, invoicing, returns and live stock control.",
-      },
-      { property: "og:title", content: "Stockify — Retail POS, Inventory & Order Management" },
-      {
-        property: "og:description",
-        content:
-          "Run checkout, orders, invoices and inventory for every branch from a single Stockify workspace.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
   component: IndexRedirect,
 });
 

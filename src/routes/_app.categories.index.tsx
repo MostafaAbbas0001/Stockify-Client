@@ -7,20 +7,6 @@ import { useI18n } from "@/i18n";
 import { categoriesApi } from "@/lib/api/endpoints";
 
 export const Route = createFileRoute("/_app/categories/")({
-  head: () => ({
-    meta: [
-      { title: "Categories — Stockify" },
-      {
-        name: "description",
-        content:
-          "Organise the Stockify catalog into categories that drive product browsing, POS search and reporting.",
-      },
-      { property: "og:title", content: "Categories — Stockify" },
-      { property: "og:description", content: "Catalog category management in Stockify." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
   component: CategoriesRoute,
 });
 

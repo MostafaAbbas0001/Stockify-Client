@@ -4,30 +4,23 @@ import { Home, SearchX } from "lucide-react";
 import { useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/$")({
-  head: () => ({
-    meta: [
-      { title: "Page Not Found — Stockify" },
-      { name: "description", content: "The requested Stockify page could not be found." },
-      { property: "og:title", content: "Page Not Found — Stockify" },
-      { property: "og:description", content: "Return to the Stockify workspace." },
-    ],
-  }),
   component: NotFoundScreen,
 });
 function NotFoundScreen() {
   const { t } = useI18n();
   return (
-    <main className="grid min-h-screen place-items-center bg-background p-6">
-      <div className="max-w-md text-center">
-        <span className="mx-auto grid size-14 place-items-center rounded-full bg-muted text-muted-foreground">
-          <SearchX className="size-6" />
-        </span>
+    <main className="relative grid min-h-screen place-items-center overflow-hidden bg-background p-6">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,color-mix(in_oklab,var(--primary)_8%,transparent),transparent_38%)]" />
+      <div className="relative max-w-md text-center">
+        <SearchX className="mx-auto size-10 text-primary" />
         <p className="mt-5 font-numeric text-sm font-semibold text-primary">404</p>
-        <h1 className="mt-1 text-2xl font-semibold">{t("common.notFoundTitle")}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{t("common.notFoundBody")}</p>
+        <h1 className="mt-1 text-3xl font-bold tracking-tight">{t("common.notFoundTitle")}</h1>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          {t("common.notFoundBody")}
+        </p>
         <Link
           to="/"
-          className="mt-6 inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground"
+          className="mt-7 inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/15"
         >
           <Home className="size-4" />
           {t("profile.backHome")}

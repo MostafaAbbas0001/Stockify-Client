@@ -517,10 +517,9 @@ export type AttributeValue = { id: number; value: string; productAttributeId?: n
 
 export type ProductAttribute = { id: number; name: string; values: AttributeValue[] };
 
-export type ProductAttributeAssignment = {
+export type ProductAssignedAttribute = {
   attributeId: number;
   name: string;
-  isRequired: boolean;
   values: AttributeValue[];
 };
 
@@ -533,9 +532,7 @@ export type ProductSummary = {
   brandName: string | null;
   categoryId: number | null;
   categoryName: string | null;
-  requiresLotTracking: boolean;
-  requiresExpiryDate: boolean;
-  attributes: ProductAttributeAssignment[] | null;
+  attributes: ProductAssignedAttribute[] | null;
   createdAt?: string | null;
 };
 
@@ -547,9 +544,7 @@ export type ProductRequest = {
   imageUrl: string | null;
   brandId: number | null;
   categoryId: number | null;
-  requiresLotTracking: boolean;
-  requiresExpiryDate: boolean;
-  attributes: { attributeId: number; isRequired: boolean }[] | null;
+  attributeIds: number[];
 };
 
 export type ProductVariantAttribute = {
@@ -581,7 +576,6 @@ export type ProductVariantRow = {
 
 export type VariantCreateRequest = {
   productId: number;
-  sku?: string | null;
   barcode?: string | null;
   imageUrl?: string | null;
   price: number;
@@ -606,11 +600,10 @@ export type InventoryLotRow = {
   productVariantId: number;
   sku: string | null;
   productName: string | null;
-  lotNumber: string | null;
+  lotNumber: string;
   manufacturingDate: string | null;
   expiryDate: string | null;
   receivedAt: string;
-  isInternal: boolean;
   totalQuantity: number;
   branches: InventoryLotBranch[] | null;
 };
@@ -620,17 +613,16 @@ export type InventoryLotDetail = {
   variantId: number;
   sku: string | null;
   productName: string | null;
-  lotNumber: string | null;
+  lotNumber: string;
   manufacturingDate: string | null;
   expiryDate: string | null;
   receivedAt: string;
-  isInternal: boolean;
   totalQuantity: number;
 };
 
 export type LotCreateRequest = {
   variantId: number;
-  lotNumber: string | null;
+  lotNumber: string;
   manufacturingDate: string | null;
   expiryDate: string | null;
 };

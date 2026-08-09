@@ -3,12 +3,13 @@ import { Plus, Pencil, Undo2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
 import { Pagination } from "@/components/common/Pagination";
 import { SearchInput } from "@/components/common/SearchInput";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
+import { Card, CardHeader, PageHeader, TableShell, Td, Th } from "@/components/common/Surface";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { PERM } from "@/features/auth/permissions";
 import { AdjustmentFormDialog } from "@/features/inventory/AdjustmentFormDialog";
@@ -30,26 +31,26 @@ export function StockScreen() {
   const [tab, setTab] = useState<Tab>("lots");
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-lg font-semibold text-foreground">{t("stock.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("stock.subtitle")}</p>
-        </div>
-        <div className="flex shrink-0 gap-2">
-          {tab === "lots" && can(PERM.stockRestock) && <NewLotButton />}
-          {tab === "adjustments" && can(PERM.stockReduce) && <NewAdjustmentButton />}
-        </div>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title={t("stock.title")}
+        description={t("stock.subtitle")}
+        actions={
+          <div className="flex shrink-0 gap-2">
+            {tab === "lots" && can(PERM.stockRestock) && <NewLotButton />}
+            {tab === "adjustments" && can(PERM.stockReduce) && <NewAdjustmentButton />}
+          </div>
+        }
+      />
 
-      <div className="inline-flex rounded-lg border border-border bg-surface-sunken p-1">
+      <div className="inline-flex w-full rounded-xl border border-border bg-surface-sunken p-1 sm:w-auto">
         {(["lots", "adjustments"] as const).map((option) => (
           <button
             key={option}
             type="button"
             onClick={() => setTab(option)}
             className={cn(
-              "rounded-md px-3 py-1.5 text-sm font-medium",
+              "h-10 flex-1 rounded-lg px-4 text-sm font-semibold transition sm:flex-none",
               tab === option
                 ? "bg-card text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
@@ -73,7 +74,7 @@ function NewLotButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+        className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/15 transition hover:bg-primary/90"
       >
         <Plus className="size-4" />
         {t("stock.newLot")}
@@ -91,7 +92,7 @@ function NewAdjustmentButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+        className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/15 transition hover:bg-primary/90"
       >
         <Plus className="size-4" />
         {t("stock.newAdjustment")}
@@ -142,14 +143,14 @@ function LotsPanel({ locale }: { locale: "en" | "ar" }) {
               placeholder={t("stock.searchLots")}
               className="min-w-56 flex-1"
             />
-            <select
+            <AppSelect
               value={branchId ?? ""}
               onChange={(event) => {
                 setBranchId(event.target.value ? Number(event.target.value) : null);
                 setPage(1);
               }}
               aria-label={t("stock.branch")}
-              className="h-10 rounded-lg border border-input bg-background px-2 text-sm outline-none focus:border-ring"
+              className="h-11 rounded-xl border border-input bg-background px-3 text-sm outline-none focus:border-ring"
             >
               <option value="">{t("common.all")}</option>
               {(branches.data ?? []).map((branch) => (
@@ -157,8 +158,8 @@ function LotsPanel({ locale }: { locale: "en" | "ar" }) {
                   {branch.name}
                 </option>
               ))}
-            </select>
-            <label className="flex h-10 items-center gap-2 rounded-lg border border-border px-3 text-xs text-foreground">
+            </AppSelect>
+            <label className="flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-3 text-xs font-medium text-foreground">
               <input
                 type="checkbox"
                 checked={includeEmpty}
@@ -170,7 +171,7 @@ function LotsPanel({ locale }: { locale: "en" | "ar" }) {
               />
               {t("stock.includeEmpty")}
             </label>
-            <label className="flex h-10 items-center gap-2 rounded-lg border border-border px-3 text-xs text-foreground">
+            <label className="flex h-11 items-center gap-2 rounded-xl border border-border bg-background px-3 text-xs font-medium text-foreground">
               <input
                 type="checkbox"
                 checked={includeExpired}
@@ -222,13 +223,7 @@ function LotsPanel({ locale }: { locale: "en" | "ar" }) {
                         {lot.sku ?? "—"}
                       </span>
                     </Td>
-                    <Td className="font-numeric">
-                      {lot.isInternal ? (
-                        <StatusBadge tone="neutral">{t("stock.internalLot")}</StatusBadge>
-                      ) : (
-                        (lot.lotNumber ?? "—")
-                      )}
-                    </Td>
+                    <Td className="font-numeric">{lot.lotNumber}</Td>
                     <Td>
                       <div className="flex items-center gap-2">
                         <span>{lot.expiryDate ? formatDate(lot.expiryDate, locale) : "—"}</span>
@@ -326,7 +321,7 @@ function AdjustmentsPanel({ locale }: { locale: "en" | "ar" }) {
               placeholder={t("stock.searchAdjustments")}
               className="min-w-56 flex-1"
             />
-            <select
+            <AppSelect
               value={branchId ?? ""}
               onChange={(event) => {
                 setBranchId(event.target.value ? Number(event.target.value) : null);
@@ -341,7 +336,7 @@ function AdjustmentsPanel({ locale }: { locale: "en" | "ar" }) {
                   {branch.name}
                 </option>
               ))}
-            </select>
+            </AppSelect>
           </div>
         }
       />
@@ -410,7 +405,7 @@ function AdjustmentsPanel({ locale }: { locale: "en" | "ar" }) {
                             type="button"
                             aria-label={t("common.edit")}
                             onClick={() => setEditing(row)}
-                            className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                            className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                           >
                             <Pencil className="size-3.5" />
                           </button>
@@ -421,7 +416,7 @@ function AdjustmentsPanel({ locale }: { locale: "en" | "ar" }) {
                               setReverseError(null);
                               setReversing(row);
                             }}
-                            className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-error-soft hover:text-destructive"
+                            className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-destructive"
                           >
                             <Undo2 className="size-3.5" />
                           </button>

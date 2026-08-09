@@ -4,13 +4,14 @@ import { BarChart3, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
 import { Pagination } from "@/components/common/Pagination";
 import { RequirePermission } from "@/components/common/RequirePermission";
 import { SearchInput } from "@/components/common/SearchInput";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
+import { Card, CardHeader, PageHeader, TableShell, Td, Th } from "@/components/common/Surface";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { PERM, TAB } from "@/features/auth/permissions";
 import { EmployeeFormDialog } from "@/features/employees/EmployeeFormDialog";
@@ -22,23 +23,6 @@ import { isApiError } from "@/lib/api/errors";
 import type { EmployeeRow } from "@/lib/api/types";
 
 export const Route = createFileRoute("/_app/employees/")({
-  head: () => ({
-    meta: [
-      { title: "Employees — Stockify" },
-      {
-        name: "description",
-        content:
-          "Stockify staff records: manage employees per branch, flag salespeople and review fully paid sales totals.",
-      },
-      { property: "og:title", content: "Employees — Stockify" },
-      {
-        property: "og:description",
-        content: "Branch staff records and salesperson performance in Stockify.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
   component: EmployeesRoute,
 });
 
@@ -95,26 +79,26 @@ function EmployeesScreen() {
   const filtered = Boolean(search || branchId || salesOnly);
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold text-foreground">{t("employees.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("employees.subtitle")}</p>
-        </div>
-        {can(PERM.employeeCreate) && (
-          <button
-            type="button"
-            onClick={() => {
-              setEditing(null);
-              setFormOpen(true);
-            }}
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-          >
-            <Plus className="size-4" />
-            {t("employees.newEmployee")}
-          </button>
-        )}
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title={t("employees.title")}
+        description={t("employees.subtitle")}
+        actions={
+          can(PERM.employeeCreate) && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditing(null);
+                setFormOpen(true);
+              }}
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="size-4" />
+              {t("employees.newEmployee")}
+            </button>
+          )
+        }
+      />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
         <Card>
@@ -131,7 +115,7 @@ function EmployeesScreen() {
                   placeholder={t("employees.searchPlaceholder")}
                   className="min-w-56 flex-1"
                 />
-                <select
+                <AppSelect
                   value={branchId ?? ""}
                   onChange={(event) => {
                     setBranchId(event.target.value ? Number(event.target.value) : null);
@@ -146,7 +130,7 @@ function EmployeesScreen() {
                       {branch.name}
                     </option>
                   ))}
-                </select>
+                </AppSelect>
                 <label className="flex h-10 items-center gap-2 rounded-lg border border-border px-3 text-xs font-medium text-foreground">
                   <input
                     type="checkbox"
@@ -214,7 +198,7 @@ function EmployeesScreen() {
                             type="button"
                             aria-label={t("employees.salesSummary")}
                             onClick={() => setSelected(employee)}
-                            className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                            className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                           >
                             <BarChart3 className="size-3.5" />
                           </button>
@@ -226,7 +210,7 @@ function EmployeesScreen() {
                                 setEditing(employee);
                                 setFormOpen(true);
                               }}
-                              className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                              className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                             >
                               <Pencil className="size-3.5" />
                             </button>
@@ -239,7 +223,7 @@ function EmployeesScreen() {
                                 setDeleteError(null);
                                 setDeleting(employee);
                               }}
-                              className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-error-soft hover:text-destructive"
+                              className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-destructive"
                             >
                               <Trash2 className="size-3.5" />
                             </button>

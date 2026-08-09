@@ -3,12 +3,13 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
 import { Pagination } from "@/components/common/Pagination";
 import { RequirePermission } from "@/components/common/RequirePermission";
 import { SearchInput } from "@/components/common/SearchInput";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
+import { Card, CardHeader, PageHeader, TableShell, Td, Th } from "@/components/common/Surface";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { PERM, TAB } from "@/features/auth/permissions";
 import { ExpenseFormDialog } from "@/features/expenses/ExpenseFormDialog";
@@ -35,21 +36,6 @@ export const Route = createFileRoute("/_app/expenses/")({
     from: typeof raw["from"] === "string" && raw["from"] ? raw["from"] : undefined,
     to: typeof raw["to"] === "string" && raw["to"] ? raw["to"] : undefined,
     page: Math.max(1, Number(raw["page"]) || 1),
-  }),
-  head: () => ({
-    meta: [
-      { title: "Expenses — Stockify" },
-      {
-        name: "description",
-        content:
-          "Track multi-line business expenses, accounting periods and approved payments in Stockify.",
-      },
-      { property: "og:title", content: "Expenses — Stockify" },
-      {
-        property: "og:description",
-        content: "Business expense register and payment workflow in Stockify.",
-      },
-    ],
   }),
   component: ExpensesRoute,
 });
@@ -103,23 +89,23 @@ function ExpensesScreen() {
     filters.q || filters.branch || filters.group || filters.category || filters.from || filters.to,
   );
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold">{t("expenses.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("expenses.subtitle")}</p>
-        </div>
-        {can(PERM.expenseCreate) && (
-          <button
-            type="button"
-            onClick={() => setFormOpen(true)}
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground"
-          >
-            <Plus className="size-4" />
-            {t("expenses.newExpense")}
-          </button>
-        )}
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title={t("expenses.title")}
+        description={t("expenses.subtitle")}
+        actions={
+          can(PERM.expenseCreate) && (
+            <button
+              type="button"
+              onClick={() => setFormOpen(true)}
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground"
+            >
+              <Plus className="size-4" />
+              {t("expenses.newExpense")}
+            </button>
+          )
+        }
+      />
       <Card>
         <CardHeader
           title={t("common.search")}
@@ -131,7 +117,7 @@ function ExpensesScreen() {
                 placeholder={t("expenses.searchPlaceholder")}
                 className="min-w-56"
               />
-              <select
+              <AppSelect
                 value={filters.branch ?? ""}
                 onChange={(event) =>
                   setFilters({
@@ -146,8 +132,8 @@ function ExpensesScreen() {
                     {branch.name}
                   </option>
                 ))}
-              </select>
-              <select
+              </AppSelect>
+              <AppSelect
                 value={filters.group ?? ""}
                 onChange={(event) =>
                   setFilters({
@@ -163,8 +149,8 @@ function ExpensesScreen() {
                     {category.name}
                   </option>
                 ))}
-              </select>
-              <select
+              </AppSelect>
+              <AppSelect
                 value={filters.category ?? ""}
                 disabled={!filters.group}
                 onChange={(event) =>
@@ -180,7 +166,7 @@ function ExpensesScreen() {
                     {category.name}
                   </option>
                 ))}
-              </select>
+              </AppSelect>
               <input
                 type="date"
                 value={filters.from ?? ""}

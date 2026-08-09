@@ -40,7 +40,7 @@ export function SearchInput({
         autoFocus={autoFocus}
         onChange={(event) => setDraft(event.target.value)}
         placeholder={placeholder ?? t("common.searchPlaceholder")}
-        className="h-10 w-full rounded-lg border border-input bg-background ps-9 pe-9 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/25"
+        className="h-11 w-full rounded-xl border border-input bg-background ps-10 pe-10 text-sm text-foreground shadow-sm outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/15"
       />
       {draft.length > 0 && (
         <button
@@ -50,7 +50,7 @@ export function SearchInput({
             onChange("");
           }}
           aria-label={t("common.clear")}
-          className="absolute inset-y-0 end-2 my-auto grid size-6 place-items-center rounded-md text-muted-foreground hover:bg-muted"
+          className="absolute inset-y-0 end-1.5 my-auto grid size-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
         >
           <X className="size-3.5" />
         </button>

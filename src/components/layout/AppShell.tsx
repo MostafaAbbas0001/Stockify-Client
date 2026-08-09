@@ -1,10 +1,20 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Menu, X } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Menu,
+  ScanBarcode,
+  Store,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { NAV_SECTIONS } from "./navigation";
 import { UserMenu } from "./UserMenu";
+import { BrandLogo, BrandMark } from "@/components/common/BrandMark";
 import { useAuth } from "@/features/auth/context/AuthContext";
+import { TAB } from "@/features/auth/permissions";
 import { useI18n } from "@/i18n";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +24,7 @@ function NavList({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: (
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   return (
-    <nav className="flex flex-col gap-6 px-3 py-4" aria-label={t("nav.workspace")}>
+    <nav className="flex flex-col gap-5 px-3 py-4" aria-label={t("nav.workspace")}>
       {NAV_SECTIONS.map((section) => {
         const items = section.items.filter((item) => can(item.tab));
         if (items.length === 0) return null;
@@ -34,21 +44,23 @@ function NavList({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: (
                   onClick={onNavigate}
                   title={collapsed ? t(item.labelKey) : undefined}
                   className={cn(
-                    "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    "group relative flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-[0.82rem] font-medium transition-[background-color,color,transform]",
                     collapsed && "justify-center px-2",
                     active
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
                       : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
                   )}
                 >
                   <span
                     aria-hidden
                     className={cn(
-                      "absolute inset-y-1.5 start-0 w-[3px] rounded-full bg-sidebar-primary transition-opacity",
+                      "absolute inset-y-2 start-0 w-[3px] rounded-full bg-sidebar-primary transition-opacity",
                       active ? "opacity-100" : "opacity-0",
                     )}
                   />
-                  <item.icon className="size-[1.05rem] shrink-0" />
+                  <item.icon
+                    className={cn("size-[1.05rem] shrink-0", active && "text-sidebar-primary")}
+                  />
                   {!collapsed && <span className="truncate">{t(item.labelKey)}</span>}
                   {!collapsed && item.comingSoon && (
                     <span className="ms-auto rounded-full bg-sidebar-accent/70 px-2 py-0.5 text-[0.62rem] font-semibold uppercase tracking-wide text-sidebar-foreground/60">
@@ -66,27 +78,14 @@ function NavList({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: (
 }
 
 function Brand({ collapsed }: { collapsed: boolean }) {
-  const { t } = useI18n();
   return (
     <div
       className={cn(
-        "flex h-16 shrink-0 items-center gap-2.5 border-b border-sidebar-border/70 px-4",
-        collapsed && "justify-center px-2",
+        "flex h-20 w-full shrink-0 items-center justify-center border-b border-sidebar-border/70 px-3",
+        collapsed && "px-2",
       )}
     >
-      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-sidebar-primary text-sm font-bold text-sidebar-primary-foreground shadow-sm">
-        S
-      </span>
-      {!collapsed && (
-        <div className="min-w-0">
-          <p className="truncate text-[0.95rem] font-semibold tracking-tight text-sidebar-foreground">
-            {t("common.appName")}
-          </p>
-          <p className="text-[0.65rem] font-medium uppercase tracking-[0.12em] text-sidebar-foreground/45">
-            {t("nav.workspace")}
-          </p>
-        </div>
-      )}
+      {collapsed ? <BrandMark className="size-12" /> : <BrandLogo className="h-14 w-56" />}
     </div>
   );
 }
@@ -135,7 +134,7 @@ function ScrollableNav({ collapsed, onNavigate }: { collapsed: boolean; onNaviga
           <button
             type="button"
             onClick={() => scrollBy(-180)}
-            className="pointer-events-auto grid size-7 place-items-center rounded-full border border-sidebar-border bg-sidebar-accent text-sidebar-foreground/70 shadow-sm transition-colors hover:bg-sidebar-primary hover:text-sidebar-primary-foreground"
+            className="pointer-events-auto grid size-7 place-items-center text-sidebar-foreground/70 transition-colors hover:text-sidebar-primary"
             aria-label={t("nav.scrollUp")}
             title={t("nav.scrollUp")}
           >
@@ -149,7 +148,7 @@ function ScrollableNav({ collapsed, onNavigate }: { collapsed: boolean; onNaviga
           <button
             type="button"
             onClick={() => scrollBy(180)}
-            className="pointer-events-auto grid size-7 place-items-center rounded-full border border-sidebar-border bg-sidebar-accent text-sidebar-foreground/70 shadow-sm transition-colors hover:bg-sidebar-primary hover:text-sidebar-primary-foreground"
+            className="pointer-events-auto grid size-7 place-items-center text-sidebar-foreground/70 transition-colors hover:text-sidebar-primary"
             aria-label={t("nav.scrollDown")}
             title={t("nav.scrollDown")}
           >
@@ -163,9 +162,13 @@ function ScrollableNav({ collapsed, onNavigate }: { collapsed: boolean; onNaviga
 
 export function AppShell({ children, flush = false }: { children: ReactNode; flush?: boolean }) {
   const { t, dir } = useI18n();
+  const { user, can } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const currentItem = NAV_SECTIONS.flatMap((section) => section.items).find(
+    (item) => pathname === item.to || pathname.startsWith(`${item.to}/`),
+  );
 
   useEffect(() => {
     setMobileOpen(false);
@@ -185,7 +188,7 @@ export function AppShell({ children, flush = false }: { children: ReactNode; flu
       <aside
         className={cn(
           "relative z-20 hidden h-svh shrink-0 border-e border-sidebar-border bg-sidebar transition-[width] duration-200 lg:flex lg:flex-col",
-          collapsed ? "w-[4.5rem]" : "w-64",
+          collapsed ? "w-[4.75rem]" : "w-[16.5rem]",
         )}
       >
         <Brand collapsed={collapsed} />
@@ -204,51 +207,93 @@ export function AppShell({ children, flush = false }: { children: ReactNode; flu
         </button>
       </aside>
 
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <button
-            type="button"
-            aria-label={t("common.close")}
-            className="absolute inset-0 bg-foreground/45 backdrop-blur-sm"
-            onClick={() => setMobileOpen(false)}
-          />
-          <div className="absolute inset-y-0 start-0 flex w-72 flex-col border-e border-sidebar-border bg-sidebar shadow-2xl">
-            <div className="flex items-center justify-between">
-              <Brand collapsed={false} />
-              <button
-                type="button"
-                onClick={() => setMobileOpen(false)}
-                className="me-3 rounded-lg p-2 text-sidebar-foreground/70 hover:bg-sidebar-accent/60"
-                aria-label={t("common.close")}
-              >
-                <X className="size-4" />
-              </button>
-            </div>
-            <ScrollableNav collapsed={false} onNavigate={() => setMobileOpen(false)} />
-            <div className="shrink-0 border-t border-sidebar-border/70 p-3">
-              <UserMenu />
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="relative flex h-svh min-w-0 flex-1 overflow-hidden">
+      <div
+        aria-hidden={!mobileOpen}
+        className={cn(
+          "fixed inset-0 z-50 transition-[visibility] duration-200 lg:hidden",
+          mobileOpen ? "visible pointer-events-auto" : "invisible pointer-events-none delay-200",
+        )}
+      >
         <button
           type="button"
-          onClick={() => setMobileOpen(true)}
-          className="fixed start-3 top-3 z-40 grid size-10 place-items-center rounded-xl border border-border bg-background/95 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:bg-muted lg:hidden"
-          aria-label={t("nav.workspace")}
+          aria-label={t("common.close")}
+          tabIndex={mobileOpen ? 0 : -1}
+          className={cn(
+            "absolute inset-0 bg-foreground/45 backdrop-blur-sm transition-opacity duration-200 ease-linear",
+            mobileOpen ? "opacity-100" : "opacity-0",
+          )}
+          onClick={() => setMobileOpen(false)}
+        />
+        <div
+          className={cn(
+            "absolute inset-y-0 start-0 flex w-72 flex-col border-e border-sidebar-border bg-sidebar shadow-2xl transition-transform duration-200 ease-linear",
+            mobileOpen ? "translate-x-0" : dir === "rtl" ? "translate-x-full" : "-translate-x-full",
+          )}
         >
-          <Menu className="size-5" />
-        </button>
+          <div className="flex items-center">
+            <Brand collapsed={false} />
+          </div>
+          <ScrollableNav collapsed={false} onNavigate={() => setMobileOpen(false)} />
+          <div className="shrink-0 border-t border-sidebar-border/70 p-3">
+            <UserMenu />
+          </div>
+        </div>
+      </div>
+
+      <div className="relative flex h-svh min-w-0 flex-1 flex-col overflow-hidden">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-border/70 bg-background/85 px-3 backdrop-blur-xl sm:px-5 lg:hidden">
+          <div className="flex min-w-0 items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              className="grid size-10 shrink-0 place-items-center text-muted-foreground transition-colors hover:text-primary lg:hidden"
+              aria-label={t("nav.workspace")}
+            >
+              <Menu className="size-5" />
+            </button>
+            <span className="hidden shrink-0 text-primary sm:block lg:hidden">
+              {currentItem ? <currentItem.icon className="size-4" /> : <Store className="size-4" />}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-foreground sm:text-[0.95rem]">
+                {currentItem ? t(currentItem.labelKey) : t("common.appName")}
+              </p>
+              <p className="hidden truncate text-[0.7rem] text-muted-foreground sm:block">
+                {user?.branchName ?? t("nav.workspace")}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {user?.branchName && (
+              <span className="hidden items-center gap-2 rounded-xl border border-border/80 bg-card px-3 py-2 text-xs font-medium text-muted-foreground shadow-sm md:inline-flex">
+                <Store className="size-3.5 text-primary" />
+                {user.branchName}
+              </span>
+            )}
+            {can(TAB.pos) && !pathname.startsWith("/pos") && (
+              <Link
+                to="/pos"
+                className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-3 text-xs font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary-hover"
+              >
+                <ScanBarcode className="size-4" />
+                <span className="hidden sm:inline">{t("nav.pos")}</span>
+              </Link>
+            )}
+          </div>
+        </header>
 
         <main
           className={cn(
-            "flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain",
-            flush ? "pt-14 lg:pt-0" : "p-4 pt-16 lg:p-6",
+            "app-main flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain",
+            flush ? "" : "p-4 sm:p-5 lg:p-6 xl:p-8",
           )}
         >
-          {children}
+          <div
+            key={pathname}
+            className="flex min-h-0 min-w-0 flex-1 flex-col animate-in fade-in-0 slide-in-from-bottom-2 duration-200 ease-out motion-reduce:animate-none"
+          >
+            {children}
+          </div>
         </main>
       </div>
     </div>

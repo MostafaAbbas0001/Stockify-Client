@@ -51,15 +51,13 @@ export const productsApi = {
     search?: string | undefined;
     brandId?: number | undefined;
     categoryId?: number | undefined;
-    requiresLotTracking?: boolean | undefined;
-    requiresExpiryDate?: boolean | undefined;
     page?: number | undefined;
   }) => unwrapPaged<ProductSummary>(await api<unknown>("products", { query }), "products"),
   get: (id: number) => api<ProductDetail>(`products/${id}`),
   create: (body: ProductRequest) => api<ProductDetail>("products", { method: "POST", body }),
   update: (id: number, body: ProductRequest) =>
     api<ProductDetail>(`products/${id}`, { method: "PUT", body }),
-  setAttributes: (id: number, body: { attributeId: number; isRequired: boolean }[]) =>
+  setAttributes: (id: number, body: number[]) =>
     api<ProductDetail>(`products/${id}/attributes`, { method: "PUT", body }),
   remove: (id: number) => api<void>(`products/${id}`, { method: "DELETE" }),
   variants: async (

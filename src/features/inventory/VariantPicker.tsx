@@ -42,7 +42,7 @@ export function VariantPicker({
             type="button"
             aria-label={t("common.clear")}
             onClick={() => onChange(null)}
-            className="grid size-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="grid size-7 shrink-0 place-items-center text-muted-foreground transition-colors hover:text-foreground"
           >
             <X className="size-3.5" />
           </button>

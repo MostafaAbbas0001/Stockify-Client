@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { AppSelect } from "@/components/common/AppSelect";
 import { branchesQuery, rolesQuery } from "@/features/reference/queries";
 import { useI18n } from "@/i18n";
 import { usersApi } from "@/lib/api/endpoints";
@@ -113,7 +114,7 @@ export function UserFormDialog({
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="space-y-1">
               <span className="text-xs font-medium">{t("users.role")}</span>
-              <select
+              <AppSelect
                 value={roleId ?? ""}
                 onChange={(event) =>
                   setRoleId(event.target.value ? Number(event.target.value) : null)
@@ -126,11 +127,11 @@ export function UserFormDialog({
                     {role.name}
                   </option>
                 ))}
-              </select>
+              </AppSelect>
             </label>
             <label className="space-y-1">
               <span className="text-xs font-medium">{t("common.branch")}</span>
-              <select
+              <AppSelect
                 value={branchId ?? ""}
                 onChange={(event) =>
                   setBranchId(event.target.value ? Number(event.target.value) : null)
@@ -143,7 +144,7 @@ export function UserFormDialog({
                     {branch.name}
                   </option>
                 ))}
-              </select>
+              </AppSelect>
             </label>
           </div>
           <DialogFooter className="gap-2">

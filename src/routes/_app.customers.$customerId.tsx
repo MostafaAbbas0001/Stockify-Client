@@ -24,18 +24,6 @@ import type { InvoiceDetail, OrderRow } from "@/lib/api/types";
 import { formatDate, formatDateTime, formatMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/_app/customers/$customerId")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Customer ${params.customerId} — Stockify` },
-      {
-        name: "description",
-        content:
-          "Stockify customer profile with contact, order, invoice and outstanding-balance history.",
-      },
-      { property: "og:title", content: `Customer ${params.customerId} — Stockify` },
-      { property: "og:description", content: "Customer account and purchase history in Stockify." },
-    ],
-  }),
   component: CustomerDetailRoute,
 });
 function CustomerDetailRoute() {
@@ -265,9 +253,7 @@ function Contact({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
-        <Icon className="size-4" />
-      </span>
+      <Icon className="mt-0.5 size-5 shrink-0 text-primary" />
       <div className="min-w-0">
         <p className="text-xs text-muted-foreground">{label}</p>
         <p className="break-words text-sm font-medium">{value}</p>

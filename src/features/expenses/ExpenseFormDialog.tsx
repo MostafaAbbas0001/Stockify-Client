@@ -11,12 +11,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { AppSelect } from "@/components/common/AppSelect";
 import { branchesQuery, currenciesQuery } from "@/features/reference/queries";
 import { useI18n } from "@/i18n";
 import { employeesApi, expensesApi } from "@/lib/api/endpoints";
 import { isApiError } from "@/lib/api/errors";
 import type { CreateExpenseLineRequest } from "@/lib/api/types";
-import { toDateInput } from "@/lib/format";
 
 type LineMode = "Amount" | "Fixed" | "Percentage" | "Quantity";
 type DraftLine = {
@@ -187,7 +187,7 @@ export function ExpenseFormDialog({
           )}
           <label className="block max-w-sm space-y-1">
             <span className="text-xs font-medium">{t("expenses.headerCategory")}</span>
-            <select
+            <AppSelect
               value={rootCategoryId ?? ""}
               onChange={(event) => {
                 setRootCategoryId(event.target.value ? Number(event.target.value) : null);
@@ -202,7 +202,7 @@ export function ExpenseFormDialog({
                   {category.name}
                 </option>
               ))}
-            </select>
+            </AppSelect>
           </label>
           <div className="space-y-3">
             {lines.map((line, index) => (
@@ -218,7 +218,7 @@ export function ExpenseFormDialog({
                         setLines((current) => current.filter((item) => item.key !== line.key))
                       }
                       aria-label={t("common.delete")}
-                      className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-error-soft hover:text-destructive"
+                      className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-destructive"
                     >
                       <Trash2 className="size-4" />
                     </button>
@@ -227,7 +227,7 @@ export function ExpenseFormDialog({
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   <label className="space-y-1">
                     <span className="text-xs font-medium">{t("expenses.lineCategory")}</span>
-                    <select
+                    <AppSelect
                       value={line.categoryId ?? ""}
                       onChange={(event) =>
                         updateLine(line.key, {
@@ -243,11 +243,11 @@ export function ExpenseFormDialog({
                           {category.name}
                         </option>
                       ))}
-                    </select>
+                    </AppSelect>
                   </label>
                   <label className="space-y-1">
                     <span className="text-xs font-medium">{t("expenses.calculation")}</span>
-                    <select
+                    <AppSelect
                       value={line.mode}
                       onChange={(event) =>
                         updateLine(line.key, { mode: event.target.value as LineMode })
@@ -258,7 +258,7 @@ export function ExpenseFormDialog({
                       <option value="Fixed">{t("expenses.fixed")}</option>
                       <option value="Quantity">{t("expenses.quantityCost")}</option>
                       <option value="Percentage">{t("expenses.salesPercentage")}</option>
-                    </select>
+                    </AppSelect>
                   </label>
                   {line.mode === "Amount" && (
                     <Field
@@ -298,7 +298,7 @@ export function ExpenseFormDialog({
                     <>
                       <label className="space-y-1">
                         <span className="text-xs font-medium">{t("common.employee")}</span>
-                        <select
+                        <AppSelect
                           value={line.employeeId ?? ""}
                           onChange={(event) =>
                             updateLine(line.key, {
@@ -313,7 +313,7 @@ export function ExpenseFormDialog({
                               {employee.name}
                             </option>
                           ))}
-                        </select>
+                        </AppSelect>
                       </label>
                       <Field
                         label={t("common.from")}
@@ -331,7 +331,7 @@ export function ExpenseFormDialog({
                   )}
                   <label className="space-y-1">
                     <span className="text-xs font-medium">{t("common.currency")}</span>
-                    <select
+                    <AppSelect
                       value={line.currencyId ?? ""}
                       onChange={(event) =>
                         updateLine(line.key, {
@@ -346,11 +346,11 @@ export function ExpenseFormDialog({
                           {currency.code}
                         </option>
                       ))}
-                    </select>
+                    </AppSelect>
                   </label>
                   <label className="space-y-1">
                     <span className="text-xs font-medium">{t("common.branch")}</span>
-                    <select
+                    <AppSelect
                       value={line.branchId ?? ""}
                       onChange={(event) =>
                         updateLine(line.key, {
@@ -365,7 +365,7 @@ export function ExpenseFormDialog({
                           {branch.name}
                         </option>
                       ))}
-                    </select>
+                    </AppSelect>
                   </label>
                   <Field
                     label={t("expenses.periodStart")}

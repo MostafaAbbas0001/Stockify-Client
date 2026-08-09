@@ -3,12 +3,14 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { AppSelect } from "@/components/common/AppSelect";
+import { FormDialog } from "@/components/common/FormDialog";
 import { useI18n } from "@/i18n";
 import { productVariantsApi } from "@/lib/api/endpoints";
 import { isApiError } from "@/lib/api/errors";
 import type { ProductDetail, ProductVariantRow } from "@/lib/api/types";
 
-/** Create / edit dialog for a product variant (SKU, pricing, attribute values). */
+/** Create / edit dialog for a product variant. SKU is generated from its catalog data. */
 export function VariantFormDialog({
   open,
   onOpenChange,
@@ -24,7 +26,6 @@ export function VariantFormDialog({
   const queryClient = useQueryClient();
   const assignments = product.attributes ?? [];
 
-  const [sku, setSku] = useState(variant?.sku ?? "");
   const [barcode, setBarcode] = useState(variant?.barcode ?? "");
   const [imageUrl, setImageUrl] = useState(variant?.imageUrl ?? "");
   const [price, setPrice] = useState(variant ? String(variant.price) : "");
@@ -50,7 +51,6 @@ export function VariantFormDialog({
         }));
       if (variant) {
         return productVariantsApi.patch(variant.id, {
-          sku: sku.trim() || null,
           barcode: barcode.trim() || null,
           imageUrl: imageUrl.trim() || null,
           price: Number(price),
@@ -60,7 +60,6 @@ export function VariantFormDialog({
       }
       return productVariantsApi.create({
         productId: product.id,
-        sku: sku.trim() || null,
         barcode: barcode.trim() || null,
         imageUrl: imageUrl.trim() || null,
         price: Number(price),
@@ -88,139 +87,30 @@ export function VariantFormDialog({
     },
   });
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-foreground/40 p-4 backdrop-blur-sm">
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          setFieldErrors({});
-          setFormError(null);
-          if (
-            !price ||
-            Number.isNaN(Number(price)) ||
-            !netPrice ||
-            Number.isNaN(Number(netPrice))
-          ) {
-            setFormError(t("common.required"));
-            return;
-          }
-          const missing = assignments.find(
-            (assignment) => assignment.isRequired && !values[assignment.attributeId],
-          );
-          if (missing) {
-            setFormError(`${missing.name}: ${t("common.required")}`);
-            return;
-          }
-          save.mutate();
-        }}
-        className="my-auto w-full max-w-lg space-y-3 rounded-xl border border-border bg-card p-5 shadow-xl"
-        noValidate
-      >
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="text-sm font-semibold text-foreground">
-            {variant ? t("products.editVariant") : t("products.newVariant")}
-          </h3>
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="text-xs font-medium text-muted-foreground hover:text-foreground"
-          >
-            {t("common.close")}
-          </button>
-        </div>
-
-        {formError && (
-          <p className="rounded-lg border border-destructive/25 bg-error-soft px-3 py-2 text-xs text-destructive">
-            {formError}
-          </p>
-        )}
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-foreground">{t("products.sku")}</span>
-            <input
-              value={sku}
-              onChange={(event) => setSku(event.target.value)}
-              placeholder={t("products.skuAuto")}
-              className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
-            />
-            {fieldErrors["sku"] && (
-              <span className="block text-[0.7rem] text-destructive">{fieldErrors["sku"]}</span>
-            )}
-          </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-foreground">{t("products.barcode")}</span>
-            <input
-              value={barcode}
-              onChange={(event) => setBarcode(event.target.value)}
-              className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
-            />
-            {fieldErrors["barcode"] && (
-              <span className="block text-[0.7rem] text-destructive">{fieldErrors["barcode"]}</span>
-            )}
-          </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-foreground">{t("common.price")}</span>
-            <input
-              inputMode="decimal"
-              value={price}
-              onChange={(event) => setPrice(event.target.value)}
-              className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
-            />
-          </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-foreground">{t("products.cost")}</span>
-            <input
-              inputMode="decimal"
-              value={netPrice}
-              onChange={(event) => setNetPrice(event.target.value)}
-              className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
-            />
-          </label>
-        </div>
-
-        <label className="block space-y-1">
-          <span className="text-xs font-medium text-foreground">{t("products.imageUrl")}</span>
-          <input
-            value={imageUrl}
-            onChange={(event) => setImageUrl(event.target.value)}
-            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
-          />
-        </label>
-
-        {assignments.length > 0 && (
-          <div className="grid gap-3 rounded-lg border border-border p-3 sm:grid-cols-2">
-            {assignments.map((assignment) => (
-              <label key={assignment.attributeId} className="block space-y-1">
-                <span className="text-xs font-medium text-foreground">
-                  {assignment.name}
-                  {assignment.isRequired && <span className="text-destructive"> *</span>}
-                </span>
-                <select
-                  value={values[assignment.attributeId] ?? ""}
-                  onChange={(event) =>
-                    setValues((current) => ({
-                      ...current,
-                      [assignment.attributeId]: event.target.value,
-                    }))
-                  }
-                  className="h-10 w-full rounded-lg border border-input bg-background px-2 text-sm outline-none focus:border-ring"
-                >
-                  <option value="">—</option>
-                  {assignment.values.map((value) => (
-                    <option key={value.id} value={value.id}>
-                      {value.value}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ))}
-          </div>
-        )}
-
-        <div className="flex gap-2 pt-1">
+    <FormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      pending={save.isPending}
+      title={variant ? t("products.editVariant") : t("products.newVariant")}
+      className="max-w-lg"
+      onSubmit={(event) => {
+        event.preventDefault();
+        setFieldErrors({});
+        setFormError(null);
+        if (!price || Number.isNaN(Number(price)) || !netPrice || Number.isNaN(Number(netPrice))) {
+          setFormError(t("common.required"));
+          return;
+        }
+        const missing = assignments.find((assignment) => !values[assignment.attributeId]);
+        if (missing) {
+          setFormError(`${missing.name}: ${t("common.required")}`);
+          return;
+        }
+        save.mutate();
+      }}
+      actions={
+        <>
           <button
             type="button"
             onClick={() => onOpenChange(false)}
@@ -236,8 +126,85 @@ export function VariantFormDialog({
             {save.isPending && <Loader2 className="size-4 animate-spin" />}
             {t("common.save")}
           </button>
+        </>
+      }
+    >
+      {formError && (
+        <p className="rounded-lg border border-destructive/25 bg-error-soft px-3 py-2 text-xs text-destructive">
+          {formError}
+        </p>
+      )}
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="block space-y-1">
+          <span className="text-xs font-medium text-foreground">{t("products.barcode")}</span>
+          <input
+            value={barcode}
+            onChange={(event) => setBarcode(event.target.value)}
+            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
+          />
+          {fieldErrors["barcode"] && (
+            <span className="block text-[0.7rem] text-destructive">{fieldErrors["barcode"]}</span>
+          )}
+        </label>
+        <label className="block space-y-1">
+          <span className="text-xs font-medium text-foreground">{t("common.price")}</span>
+          <input
+            inputMode="decimal"
+            value={price}
+            onChange={(event) => setPrice(event.target.value)}
+            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="text-xs font-medium text-foreground">{t("products.cost")}</span>
+          <input
+            inputMode="decimal"
+            value={netPrice}
+            onChange={(event) => setNetPrice(event.target.value)}
+            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
+          />
+        </label>
+      </div>
+
+      <label className="block space-y-1">
+        <span className="text-xs font-medium text-foreground">{t("products.imageUrl")}</span>
+        <input
+          value={imageUrl}
+          onChange={(event) => setImageUrl(event.target.value)}
+          className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:border-ring"
+        />
+      </label>
+
+      {assignments.length > 0 && (
+        <div className="grid gap-3 rounded-lg border border-border p-3 sm:grid-cols-2">
+          {assignments.map((assignment) => (
+            <label key={assignment.attributeId} className="block space-y-1">
+              <span className="text-xs font-medium text-foreground">
+                {assignment.name}
+                <span className="text-destructive"> *</span>
+              </span>
+              <AppSelect
+                value={values[assignment.attributeId] ?? ""}
+                onChange={(event) =>
+                  setValues((current) => ({
+                    ...current,
+                    [assignment.attributeId]: event.target.value,
+                  }))
+                }
+                className="h-10 w-full rounded-lg border border-input bg-background px-2 text-sm outline-none focus:border-ring"
+              >
+                <option value="">—</option>
+                {assignment.values.map((value) => (
+                  <option key={value.id} value={value.id}>
+                    {value.value}
+                  </option>
+                ))}
+              </AppSelect>
+            </label>
+          ))}
         </div>
-      </form>
-    </div>
+      )}
+    </FormDialog>
   );
 }

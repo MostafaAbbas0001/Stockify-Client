@@ -1,4 +1,4 @@
-import { AlertCircle, Inbox, Loader2, Lock, SearchX } from "lucide-react";
+import { AlertCircle, Inbox, Loader2, Lock, RefreshCw, SearchX } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 
@@ -10,7 +10,7 @@ function Frame({ children, className }: { children: ReactNode; className?: strin
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-surface px-6 py-14 text-center",
+        "flex min-h-52 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border/80 bg-surface/70 px-6 py-14 text-center",
         className,
       )}
     >
@@ -23,8 +23,8 @@ export function LoadingState({ label }: { label?: string }) {
   const { t } = useI18n();
   return (
     <Frame className="border-solid">
-      <Loader2 className="size-5 animate-spin text-muted-foreground" />
-      <p className="text-sm text-muted-foreground">{label ?? t("common.loading")}</p>
+      <Loader2 className="size-6 animate-spin text-primary" />
+      <p className="text-sm font-medium text-muted-foreground">{label ?? t("common.loading")}</p>
     </Frame>
   );
 }
@@ -43,10 +43,8 @@ export function EmptyState({
   const { t } = useI18n();
   const Icon = filtered ? SearchX : Inbox;
   return (
-    <Frame>
-      <span className="grid size-11 place-items-center rounded-full bg-muted text-muted-foreground">
-        <Icon className="size-5" />
-      </span>
+    <Frame className="min-h-44 rounded-none border-0 bg-transparent py-10">
+      <Icon className="size-7 text-muted-foreground" />
       <div className="space-y-1">
         <p className="text-sm font-semibold text-foreground">
           {title ?? (filtered ? t("common.noResults") : t("common.noRecords"))}
@@ -68,9 +66,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
   if (apiError?.isForbidden) {
     return (
       <Frame>
-        <span className="grid size-11 place-items-center rounded-full bg-error-soft text-destructive">
-          <Lock className="size-5" />
-        </span>
+        <Lock className="size-7 text-destructive" />
         <div className="space-y-1">
           <p className="text-sm font-semibold text-foreground">{t("common.accessDeniedTitle")}</p>
           <p className="text-xs text-muted-foreground">{t("common.accessDeniedBody")}</p>
@@ -81,9 +77,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
 
   return (
     <Frame>
-      <span className="grid size-11 place-items-center rounded-full bg-error-soft text-destructive">
-        <AlertCircle className="size-5" />
-      </span>
+      <AlertCircle className="size-7 text-destructive" />
       <div className="space-y-1">
         <p className="text-sm font-semibold text-foreground">{t("common.errorTitle")}</p>
         <p className="mx-auto max-w-md text-xs text-muted-foreground">
@@ -110,8 +104,9 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
         <button
           type="button"
           onClick={onRetry}
-          className="rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
         >
+          <RefreshCw className="size-4" />
           {t("common.retry")}
         </button>
       )}
@@ -123,9 +118,7 @@ export function AccessDenied() {
   const { t } = useI18n();
   return (
     <Frame>
-      <span className="grid size-11 place-items-center rounded-full bg-error-soft text-destructive">
-        <Lock className="size-5" />
-      </span>
+      <Lock className="size-7 text-destructive" />
       <div className="space-y-1">
         <p className="text-sm font-semibold text-foreground">{t("common.accessDeniedTitle")}</p>
         <p className="text-xs text-muted-foreground">{t("common.accessDeniedBody")}</p>

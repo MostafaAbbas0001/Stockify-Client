@@ -2,12 +2,13 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
 import { Pagination } from "@/components/common/Pagination";
 import { RequirePermission } from "@/components/common/RequirePermission";
 import { SearchInput } from "@/components/common/SearchInput";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
+import { Card, CardHeader, PageHeader, TableShell, Td, Th } from "@/components/common/Surface";
 import { TAB } from "@/features/auth/permissions";
 import { useI18n } from "@/i18n";
 import { ordersApi } from "@/lib/api/endpoints";
@@ -15,23 +16,6 @@ import { OrderStatus, orderStatusMeta } from "@/lib/enums";
 import { formatDateTime, formatMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/_app/orders/")({
-  head: () => ({
-    meta: [
-      { title: "Orders — Stockify" },
-      {
-        name: "description",
-        content:
-          "Track Stockify orders from creation to delivery: filter by status, branch and delivery location.",
-      },
-      { property: "og:title", content: "Orders — Stockify" },
-      {
-        property: "og:description",
-        content: "The Stockify order and delivery work queue for every branch.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
   component: OrdersRoute,
 });
 
@@ -72,11 +56,8 @@ function OrdersList() {
   });
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-lg font-semibold text-foreground">{t("orders.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("orders.subtitle")}</p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader title={t("orders.title")} description={t("orders.subtitle")} />
 
       <Card>
         <CardHeader
@@ -92,7 +73,7 @@ function OrdersList() {
                 placeholder={t("orders.searchPlaceholder")}
                 className="min-w-64 flex-1"
               />
-              <select
+              <AppSelect
                 value={statusId ?? ""}
                 onChange={(event) => {
                   setStatusId(event.target.value ? Number(event.target.value) : null);
@@ -110,7 +91,7 @@ function OrdersList() {
                     </option>
                   );
                 })}
-              </select>
+              </AppSelect>
               <label className="flex h-10 items-center gap-2 rounded-lg border border-border px-3 text-xs font-medium text-foreground">
                 <input
                   type="checkbox"

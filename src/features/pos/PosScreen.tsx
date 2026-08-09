@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
   CheckCircle2,
-  CircleHelp,
   Loader2,
   Minus,
   Package,
@@ -12,12 +11,14 @@ import {
   Trash2,
   UserPlus,
   WifiOff,
+  X,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { PosPaymentDialog } from "./PosPaymentDialog";
 import { usePosCart } from "./usePosCart";
+import { AppSelect } from "@/components/common/AppSelect";
 import { CustomerPickerDialog } from "@/features/customers/CustomerPickerDialog";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
@@ -25,7 +26,11 @@ import { SearchInput } from "@/components/common/SearchInput";
 import { MoneyRow } from "@/components/common/Surface";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { PERM } from "@/features/auth/permissions";
-import { branchEmployeesQuery, deliveryChargesQuery } from "@/features/reference/queries";
+import {
+  branchEmployeesQuery,
+  categoriesQuery,
+  deliveryChargesQuery,
+} from "@/features/reference/queries";
 import { useI18n } from "@/i18n";
 import { isApiError } from "@/lib/api/errors";
 import { posApi, variantsApi } from "@/lib/api/endpoints";
@@ -53,6 +58,7 @@ export function PosScreen() {
 
   const [scanValue, setScanValue] = useState("");
   const [catalogSearch, setCatalogSearch] = useState("");
+  const [categoryId, setCategoryId] = useState<number | null>(null);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [customerPickerOpen, setCustomerPickerOpen] = useState(false);
   const [salespersonId, setSalespersonId] = useState<number | null>(null);
@@ -64,14 +70,21 @@ export function PosScreen() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [online, setOnline] = useState(true);
+  const [mobileCartOpen, setMobileCartOpen] = useState(false);
 
   const employees = useQuery(branchEmployeesQuery());
   const deliveryCharges = useQuery(deliveryChargesQuery());
+  const categories = useQuery(categoriesQuery());
 
   const catalog = useQuery({
-    queryKey: ["pos", "catalog", catalogSearch],
+    queryKey: ["pos", "catalog", catalogSearch, categoryId],
     queryFn: () =>
-      variantsApi.list({ search: catalogSearch || undefined, isSellable: true, page: 1 }),
+      variantsApi.list({
+        search: catalogSearch || undefined,
+        categoryId: categoryId ?? undefined,
+        isSellable: true,
+        page: 1,
+      }),
     staleTime: 30_000,
   });
 
@@ -137,6 +150,7 @@ export function PosScreen() {
     setDeliveryLocationId(null);
     setCreated(null);
     setScanError(null);
+    setMobileCartOpen(false);
     scanRef.current?.focus();
   };
 
@@ -203,9 +217,7 @@ export function PosScreen() {
     return (
       <div className="grid flex-1 place-items-center p-6">
         <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 text-center shadow-sm">
-          <span className="mx-auto grid size-12 place-items-center rounded-full bg-success-soft text-success">
-            <CheckCircle2 className="size-6" />
-          </span>
+          <CheckCircle2 className="mx-auto size-8 text-success" />
           <h2 className="mt-4 text-base font-semibold text-foreground">{t("pos.orderCreated")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {t("orders.orderNumber")} #{created.orderId}
@@ -239,7 +251,7 @@ export function PosScreen() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4 p-4 lg:flex-row lg:p-6">
+    <div className="flex min-h-0 flex-1 flex-col gap-4 p-3 pb-24 sm:p-4 sm:pb-24 lg:flex-row lg:p-6">
       {!online && (
         <div className="fixed inset-x-0 top-0 z-40 flex items-center justify-center gap-2 bg-destructive px-4 py-2 text-xs font-semibold text-destructive-foreground">
           <WifiOff className="size-4" />
@@ -248,7 +260,7 @@ export function PosScreen() {
       )}
       {/* Scanning + catalog */}
       <section className="flex min-h-0 flex-1 flex-col gap-4">
-        <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+        <div className="rounded-2xl border border-border/80 bg-card p-3 shadow-sm sm:p-4">
           <form
             onSubmit={(event) => {
               event.preventDefault();
@@ -266,32 +278,64 @@ export function PosScreen() {
                 placeholder={t("pos.scanPlaceholder")}
                 autoFocus
                 autoComplete="off"
-                className="h-12 w-full rounded-lg border border-input bg-background ps-11 pe-3 font-numeric text-base outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/25"
+                className="h-12 w-full rounded-xl border border-input bg-background ps-11 pe-3 font-numeric text-base shadow-sm outline-none transition-colors focus:border-ring focus:ring-3 focus:ring-ring/15"
               />
             </div>
             <button
               type="submit"
               disabled={lookup.isPending || scanValue.trim().length === 0}
-              className="grid h-12 min-w-12 place-items-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+              className="grid h-12 min-w-12 place-items-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary-hover disabled:opacity-50"
             >
               {lookup.isPending ? <Loader2 className="size-4 animate-spin" /> : t("common.add")}
             </button>
           </form>
           <p className="mt-2 text-xs text-muted-foreground">{t("pos.scanHint")}</p>
           {scanError && <p className="mt-1 text-xs text-destructive">{scanError}</p>}
-          <p className="mt-2 text-[0.68rem] text-muted-foreground/80">
+          <p className="mt-2 hidden text-[0.68rem] text-muted-foreground/80 sm:block">
             {t("pos.shortcuts")}: F2 {t("pos.shortcutSearch")} · F3 {t("pos.shortcutCustomer")} · F4{" "}
             {t("pos.shortcutPay")}
           </p>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col rounded-xl border border-border bg-card shadow-sm">
-          <div className="border-b border-border p-3">
+        <div className="flex min-h-0 flex-1 flex-col rounded-2xl border border-border/80 bg-card shadow-sm">
+          <div className="space-y-3 border-b border-border/70 p-3 sm:p-4">
             <SearchInput
               value={catalogSearch}
               onChange={setCatalogSearch}
               placeholder={t("pos.catalogSearch")}
             />
+            <div
+              className="scrollbar-none flex gap-2 overflow-x-auto pb-0.5"
+              aria-label={t("products.category")}
+            >
+              <button
+                type="button"
+                onClick={() => setCategoryId(null)}
+                className={cn(
+                  "h-9 shrink-0 rounded-full border px-4 text-xs font-semibold transition-colors",
+                  categoryId === null
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                {t("common.all")}
+              </button>
+              {(categories.data ?? []).map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  onClick={() => setCategoryId(category.id)}
+                  className={cn(
+                    "h-9 shrink-0 rounded-full border px-4 text-xs font-semibold transition-colors",
+                    categoryId === category.id
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground",
+                  )}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto p-3">
             {catalog.isPending ? (
@@ -301,9 +345,10 @@ export function PosScreen() {
             ) : catalog.data.items.length === 0 ? (
               <EmptyState filtered={catalogSearch.length > 0} />
             ) : (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 2xl:grid-cols-5">
                 {catalog.data.items.map((variant) => {
                   const out = variant.stockQuantity <= 0;
+                  const low = !out && (variant.lowStockBranches?.length ?? 0) > 0;
                   return (
                     <button
                       key={variant.id}
@@ -311,11 +356,13 @@ export function PosScreen() {
                       disabled={out || addVariant.isPending}
                       onClick={() => addVariant.mutate(variant)}
                       className={cn(
-                        "group flex flex-col gap-2 rounded-lg border border-border bg-surface p-3 text-start transition-colors",
-                        out ? "opacity-55" : "hover:border-primary/40 hover:bg-primary-soft/40",
+                        "group flex min-h-48 flex-col gap-2 overflow-hidden rounded-xl border border-border/80 bg-surface p-2.5 text-start shadow-sm transition-[border-color,box-shadow,transform] sm:min-h-56 sm:p-3",
+                        out
+                          ? "opacity-55"
+                          : "hover:-translate-y-0.5 hover:border-primary/45 hover:shadow-md active:translate-y-0",
                       )}
                     >
-                      <div className="aspect-square w-full overflow-hidden rounded-md bg-surface-sunken">
+                      <div className="aspect-[4/3] w-full overflow-hidden rounded-lg bg-surface-sunken">
                         {variant.imageUrl || variant.productImageUrl ? (
                           <img
                             src={variant.imageUrl ?? variant.productImageUrl ?? ""}
@@ -329,25 +376,26 @@ export function PosScreen() {
                           </span>
                         )}
                       </div>
-                      <p className="line-clamp-2 text-xs font-semibold leading-snug text-foreground">
+                      <p className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
                         {variant.productName}
                       </p>
                       <p className="font-mono text-[0.65rem] text-muted-foreground">
                         {variant.sku}
                       </p>
                       <div className="mt-auto flex items-center justify-between gap-1">
-                        <span className="font-numeric text-sm font-semibold text-foreground">
+                        <span className="font-numeric text-base font-bold tracking-tight text-foreground">
                           {formatMoney(variant.netPrice ?? variant.price, locale)}
                         </span>
                         <span
                           className={cn(
-                            "text-[0.65rem] font-medium",
-                            out ? "text-destructive" : "text-muted-foreground",
+                            "inline-flex items-center gap-1 text-[0.65rem] font-semibold",
+                            out ? "text-destructive" : low ? "text-warning" : "text-success",
                           )}
                         >
+                          <span className="size-1.5 rounded-full bg-current" />
                           {out
                             ? t("pos.outOfStock")
-                            : `${t("pos.stock")}: ${variant.stockQuantity}`}
+                            : `${t(low ? "pos.lowStock" : "pos.inStock")}: ${variant.stockQuantity}`}
                         </span>
                       </div>
                     </button>
@@ -359,9 +407,24 @@ export function PosScreen() {
         </div>
       </section>
 
+      {/* Mobile cart backdrop */}
+      {mobileCartOpen && (
+        <button
+          type="button"
+          aria-label={t("common.close")}
+          onClick={() => setMobileCartOpen(false)}
+          className="fixed inset-0 top-16 z-40 bg-foreground/45 backdrop-blur-[2px] lg:hidden"
+        />
+      )}
+
       {/* Cart */}
-      <aside className="flex w-full flex-col rounded-xl border border-border bg-card shadow-sm lg:w-[24rem] xl:w-[26rem]">
-        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+      <aside
+        className={cn(
+          "fixed inset-x-0 bottom-0 top-16 z-50 flex min-h-0 flex-col overflow-hidden rounded-t-2xl border border-border/80 bg-card shadow-2xl transition-transform duration-200 lg:static lg:z-auto lg:w-[26rem] lg:translate-y-0 lg:rounded-2xl lg:shadow-sm xl:w-[28rem]",
+          mobileCartOpen ? "translate-y-0" : "translate-y-full",
+        )}
+      >
+        <div className="flex min-h-14 items-center justify-between border-b border-border/70 px-4 py-3">
           <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <ShoppingCart className="size-4" />
             {t("pos.cart")}
@@ -371,15 +434,25 @@ export function PosScreen() {
               </span>
             )}
           </h2>
-          {cart.lines.length > 0 && (
+          <div className="flex items-center gap-1">
+            {cart.lines.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setResetConfirmOpen(true)}
+                className="h-9 rounded-lg px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-error-soft hover:text-destructive"
+              >
+                {t("common.clear")}
+              </button>
+            )}
             <button
               type="button"
-              onClick={resetSale}
-              className="text-xs font-medium text-muted-foreground transition-colors hover:text-destructive"
+              onClick={() => setMobileCartOpen(false)}
+              className="grid size-10 place-items-center text-muted-foreground transition-colors hover:text-foreground lg:hidden"
+              aria-label={t("common.close")}
             >
-              {t("common.clear")}
+              <X className="size-5" />
             </button>
-          )}
+          </div>
         </div>
 
         <div className="min-h-[8rem] flex-1 overflow-y-auto">
@@ -392,7 +465,7 @@ export function PosScreen() {
           ) : (
             <ul className="divide-y divide-border">
               {cart.lines.map((line) => (
-                <li key={line.variantId} className="flex gap-3 px-4 py-3">
+                <li key={line.variantId} className="flex gap-3 px-4 py-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-foreground">
                       {line.productName}
@@ -405,7 +478,7 @@ export function PosScreen() {
                       <button
                         type="button"
                         onClick={() => cart.setQuantity(line.variantId, line.quantity - 1)}
-                        className="grid size-7 place-items-center rounded-md border border-border text-muted-foreground hover:bg-muted"
+                        className="grid size-10 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                         aria-label={t("common.remove")}
                       >
                         <Minus className="size-3.5" />
@@ -418,13 +491,13 @@ export function PosScreen() {
                         onChange={(event) =>
                           cart.setQuantity(line.variantId, Number(event.target.value))
                         }
-                        className="h-7 w-14 rounded-md border border-input bg-background text-center font-numeric text-xs outline-none focus:border-ring"
+                        className="h-10 w-14 rounded-xl border border-input bg-background text-center font-numeric text-sm font-semibold outline-none focus:border-ring"
                       />
                       <button
                         type="button"
                         disabled={line.quantity >= line.stockQuantity}
                         onClick={() => cart.setQuantity(line.variantId, line.quantity + 1)}
-                        className="grid size-7 place-items-center rounded-md border border-border text-muted-foreground hover:bg-muted disabled:opacity-40"
+                        className="grid size-10 place-items-center text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
                         aria-label={t("common.add")}
                       >
                         <Plus className="size-3.5" />
@@ -432,7 +505,7 @@ export function PosScreen() {
                       <button
                         type="button"
                         onClick={() => cart.removeLine(line.variantId)}
-                        className="ms-1 grid size-7 place-items-center rounded-md text-muted-foreground hover:bg-error-soft hover:text-destructive"
+                        className="ms-1 grid size-10 place-items-center text-muted-foreground transition-colors hover:text-destructive"
                         aria-label={t("common.delete")}
                       >
                         <Trash2 className="size-3.5" />
@@ -460,7 +533,7 @@ export function PosScreen() {
           )}
         </div>
 
-        <div className="space-y-3 border-t border-border p-4">
+        <div className="space-y-3 border-t border-border/70 bg-card p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="grid gap-2 sm:grid-cols-2">
             <button
               type="button"
@@ -471,7 +544,7 @@ export function PosScreen() {
               <span className="truncate">{customer ? customer.name : t("pos.selectCustomer")}</span>
             </button>
 
-            <select
+            <AppSelect
               value={salespersonId ?? ""}
               onChange={(event) =>
                 setSalespersonId(event.target.value ? Number(event.target.value) : null)
@@ -486,9 +559,9 @@ export function PosScreen() {
                   {employee.name}
                 </option>
               ))}
-            </select>
+            </AppSelect>
 
-            <select
+            <AppSelect
               value={deliveryLocationId ?? ""}
               onChange={(event) =>
                 setDeliveryLocationId(event.target.value ? Number(event.target.value) : null)
@@ -501,10 +574,10 @@ export function PosScreen() {
                   {charge.locationName} · {formatMoney(charge.fee, locale)}
                 </option>
               ))}
-            </select>
+            </AppSelect>
 
             <div className="flex gap-1.5">
-              <select
+              <AppSelect
                 value={cart.discountType}
                 onChange={(event) => {
                   const next = Number(event.target.value) as 0 | 1 | 2;
@@ -516,7 +589,7 @@ export function PosScreen() {
                 <option value={DiscountType.None}>{t("pos.discountNone")}</option>
                 <option value={DiscountType.Percent}>{t("pos.discountPercent")}</option>
                 <option value={DiscountType.Amount}>{t("pos.discountAmount")}</option>
-              </select>
+              </AppSelect>
               {cart.discountType !== DiscountType.None && (
                 <input
                   type="number"
@@ -530,7 +603,7 @@ export function PosScreen() {
             </div>
           </div>
 
-          <div className="rounded-lg bg-surface-sunken px-3 py-2">
+          <div className="rounded-xl border border-border/60 bg-surface-sunken px-3.5 py-2.5">
             <MoneyRow
               label={t("common.subtotal")}
               value={formatMoney(totals.grossSubtotal, locale)}
@@ -570,12 +643,33 @@ export function PosScreen() {
             type="button"
             onClick={handlePay}
             disabled={cart.lines.length === 0 || !can(PERM.orderCreate) || !online}
-            className="h-12 w-full rounded-lg bg-primary text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+            className="h-14 w-full rounded-xl bg-primary text-base font-bold text-primary-foreground shadow-sm transition-colors hover:bg-primary-hover disabled:opacity-50"
           >
             {t("pos.pay")} · {formatMoney(totals.total, locale)}
           </button>
         </div>
       </aside>
+
+      {!mobileCartOpen && (
+        <div className="fixed inset-x-3 bottom-[max(.75rem,env(safe-area-inset-bottom))] z-40 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setMobileCartOpen(true)}
+            className="flex h-14 w-full items-center justify-between rounded-2xl bg-primary px-4 text-primary-foreground shadow-xl shadow-black/15"
+          >
+            <span className="flex items-center gap-2 text-sm font-bold">
+              <ShoppingCart className="size-5" />
+              {t("pos.cart")}
+              <span className="rounded-full bg-primary-foreground/15 px-2 py-0.5 text-xs">
+                {totals.itemCount}
+              </span>
+            </span>
+            <span className="font-numeric text-base font-bold">
+              {formatMoney(totals.total, locale)}
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Ambiguous scan confirmation */}
       {ambiguous && (

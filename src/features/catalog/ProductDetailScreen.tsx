@@ -9,7 +9,7 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataSt
 import { Pagination } from "@/components/common/Pagination";
 import { SearchInput } from "@/components/common/SearchInput";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Card, CardHeader, KeyValue, TableShell, Td, Th } from "@/components/common/Surface";
+import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { PERM } from "@/features/auth/permissions";
 import { ProductFormDialog } from "@/features/catalog/ProductFormDialog";
@@ -75,9 +75,6 @@ export function ProductDetailScreen({ productId }: { productId: number }) {
             {t("products.title")}
           </Link>
           <h1 className="truncate text-lg font-semibold text-foreground">{detail.name}</h1>
-          <p className="text-sm text-muted-foreground">
-            {[detail.brandName, detail.categoryName].filter(Boolean).join(" • ") || "—"}
-          </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {can(PERM.productUpdate) && (
@@ -109,39 +106,28 @@ export function ProductDetailScreen({ productId }: { productId: number }) {
       <div className="grid gap-4 xl:grid-cols-[20rem_minmax(0,1fr)]">
         <Card className="h-fit">
           <CardHeader title={t("products.overview")} />
-          <div className="divide-y divide-border px-4">
-            <KeyValue label={t("products.brand")} value={detail.brandName ?? "—"} />
-            <KeyValue label={t("products.category")} value={detail.categoryName ?? "—"} />
-            <KeyValue
-              label={t("products.lotTracking")}
-              value={detail.requiresLotTracking ? t("common.yes") : t("common.no")}
-            />
-            <KeyValue
-              label={t("products.expiryTracking")}
-              value={detail.requiresExpiryDate ? t("common.yes") : t("common.no")}
-            />
-            <KeyValue
-              label={t("products.attributes")}
-              value={
-                (detail.attributes ?? []).length === 0 ? (
-                  "—"
-                ) : (
-                  <span className="flex flex-wrap justify-end gap-1">
-                    {(detail.attributes ?? []).map((attribute) => (
-                      <StatusBadge
-                        key={attribute.attributeId}
-                        tone={attribute.isRequired ? "info" : "neutral"}
-                      >
+          <dl className="p-5">
+            <div className="grid grid-cols-2 gap-x-5 gap-y-4">
+              <OverviewField label={t("products.brand")} value={detail.brandName ?? "—"} />
+              <OverviewField label={t("products.category")} value={detail.categoryName ?? "—"} />
+            </div>
+            <div className="mt-5 border-t border-border/70 pt-4">
+              <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                {t("products.attributes")}
+              </dt>
+              <dd className="mt-2 flex min-h-6 flex-wrap items-center gap-1.5">
+                {(detail.attributes ?? []).length === 0
+                  ? "—"
+                  : (detail.attributes ?? []).map((attribute) => (
+                      <StatusBadge key={attribute.attributeId} tone="info">
                         {attribute.name}
                       </StatusBadge>
                     ))}
-                  </span>
-                )
-              }
-            />
-          </div>
+              </dd>
+            </div>
+          </dl>
           {detail.description && (
-            <p className="border-t border-border p-4 text-xs leading-relaxed text-muted-foreground">
+            <p className="border-t border-border/70 px-5 py-4 text-xs leading-relaxed text-muted-foreground">
               {detail.description}
             </p>
           )}
@@ -217,7 +203,7 @@ export function ProductDetailScreen({ productId }: { productId: number }) {
                                 setEditingVariant(variant);
                                 setVariantOpen(true);
                               }}
-                              className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                              className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                             >
                               <Pencil className="size-3.5" />
                             </button>
@@ -230,7 +216,7 @@ export function ProductDetailScreen({ productId }: { productId: number }) {
                                 setDeleteError(null);
                                 setDeleting(variant);
                               }}
-                              className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-error-soft hover:text-destructive"
+                              className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-destructive"
                             >
                               <Trash2 className="size-3.5" />
                             </button>
@@ -280,6 +266,19 @@ export function ProductDetailScreen({ productId }: { productId: number }) {
         }}
         onConfirm={() => deleting && destroy.mutate(deleting.id)}
       />
+    </div>
+  );
+}
+
+function OverviewField({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+        {label}
+      </dt>
+      <dd className="mt-1 truncate text-sm font-semibold text-foreground" title={value}>
+        {value}
+      </dd>
     </div>
   );
 }

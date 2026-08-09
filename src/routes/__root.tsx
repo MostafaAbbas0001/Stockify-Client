@@ -110,19 +110,6 @@ function LocalizedError({ error, reset }: { error: Error; reset: () => void }) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      {
-        name: "robots",
-        content: "noindex, nofollow, noarchive, nosnippet, noimageindex",
-      },
-      {
-        name: "googlebot",
-        content: "noindex, nofollow, noarchive, nosnippet, noimageindex",
-      },
-      { title: "Stockify — Retail POS, Inventory & Orders" },
-    ],
     links: [
       {
         rel: "stylesheet",
@@ -134,7 +121,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      {
+        rel: "icon",
+        href: "/Stockify_Icon_Light.png",
+        type: "image/png",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        rel: "icon",
+        href: "/Stockify_Icon_Dark.png",
+        type: "image/png",
+        media: "(prefers-color-scheme: dark)",
+      },
     ],
   }),
   shellComponent: RootShell,

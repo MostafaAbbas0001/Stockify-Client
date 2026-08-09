@@ -18,11 +18,9 @@ import type { ExpenseLine } from "@/lib/api/types";
 import { formatMoney, toDateInput } from "@/lib/format";
 
 export function ExpensePaymentDialog({
-  expenseId,
   line,
   onOpenChange,
 }: {
-  expenseId: number;
   line: ExpenseLine;
   onOpenChange: (open: boolean) => void;
 }) {

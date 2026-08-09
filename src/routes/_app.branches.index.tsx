@@ -11,14 +11,6 @@ export const Route = createFileRoute("/_app/branches/")({
   validateSearch: (raw: Record<string, unknown>): { q?: string | undefined } => ({
     q: typeof raw["q"] === "string" && raw["q"] ? raw["q"] : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "Branches — Stockify" },
-      { name: "description", content: "Create, rename and deactivate Stockify retail branches." },
-      { property: "og:title", content: "Branches — Stockify" },
-      { property: "og:description", content: "Multi-branch administration in Stockify." },
-    ],
-  }),
   component: BranchesRoute,
 });
 

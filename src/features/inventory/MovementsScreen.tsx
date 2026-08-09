@@ -1,11 +1,12 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
 import { Pagination } from "@/components/common/Pagination";
 import { SearchInput } from "@/components/common/SearchInput";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
+import { Card, CardHeader, PageHeader, TableShell, Td, Th } from "@/components/common/Surface";
 import { branchesQuery, movementTypesQuery } from "@/features/reference/queries";
 import { useI18n } from "@/i18n";
 import { stockMovementsApi } from "@/lib/api/endpoints";
@@ -44,11 +45,8 @@ export function MovementsScreen() {
   const filtered = Boolean(search || movementTypeId || branchId || startDate || endDate);
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-lg font-semibold text-foreground">{t("movements.title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("movements.subtitle")}</p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader title={t("movements.title")} description={t("movements.subtitle")} />
 
       <Card>
         <CardHeader
@@ -64,7 +62,7 @@ export function MovementsScreen() {
                 placeholder={t("movements.searchMovements")}
                 className="min-w-56 flex-1"
               />
-              <select
+              <AppSelect
                 value={movementTypeId ?? ""}
                 onChange={(event) => {
                   setMovementTypeId(event.target.value ? Number(event.target.value) : null);
@@ -79,8 +77,8 @@ export function MovementsScreen() {
                     {type.name}
                   </option>
                 ))}
-              </select>
-              <select
+              </AppSelect>
+              <AppSelect
                 value={branchId ?? ""}
                 onChange={(event) => {
                   setBranchId(event.target.value ? Number(event.target.value) : null);
@@ -95,7 +93,7 @@ export function MovementsScreen() {
                     {branch.name}
                   </option>
                 ))}
-              </select>
+              </AppSelect>
               <input
                 type="date"
                 value={startDate}

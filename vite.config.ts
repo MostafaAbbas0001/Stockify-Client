@@ -19,7 +19,6 @@ export default defineConfig(({ command, mode }) => {
     plugins: [
       tailwindcss(),
       tanstackStart({
-        server: { entry: "server" },
         importProtection: {
           behavior: "error",
           client: {

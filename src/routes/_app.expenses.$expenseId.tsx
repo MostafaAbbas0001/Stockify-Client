@@ -35,20 +35,6 @@ import type { ExpenseLine, ExpenseLinePayment } from "@/lib/api/types";
 import { formatDate, formatDateTime, formatMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/_app/expenses/$expenseId")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Expense ${params.expenseId} — Stockify` },
-      {
-        name: "description",
-        content: "Review Stockify expense lines, periods and payment decisions.",
-      },
-      { property: "og:title", content: `Expense ${params.expenseId} — Stockify` },
-      {
-        property: "og:description",
-        content: "Expense details and payment approval workflow in Stockify.",
-      },
-    ],
-  }),
   component: ExpenseDetailRoute,
 });
 function ExpenseDetailRoute() {
@@ -268,7 +254,7 @@ function ExpenseDetailScreen() {
                                       setActionError(null);
                                       setDecision({ payment, approve: true });
                                     }}
-                                    className="grid size-8 place-items-center rounded-lg border border-border text-success hover:bg-success-soft"
+                                    className="grid size-8 place-items-center text-success transition-colors hover:text-success/70"
                                   >
                                     <Check className="size-3.5" />
                                   </button>
@@ -279,7 +265,7 @@ function ExpenseDetailScreen() {
                                       setActionError(null);
                                       setDecision({ payment, approve: false });
                                     }}
-                                    className="grid size-8 place-items-center rounded-lg border border-border text-destructive hover:bg-error-soft"
+                                    className="grid size-8 place-items-center text-destructive transition-colors hover:text-destructive/70"
                                   >
                                     <X className="size-3.5" />
                                   </button>
@@ -293,7 +279,7 @@ function ExpenseDetailScreen() {
                                     setActionError(null);
                                     setRemoving(payment);
                                   }}
-                                  className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground hover:bg-error-soft hover:text-destructive"
+                                  className="grid size-8 place-items-center text-muted-foreground transition-colors hover:text-destructive"
                                 >
                                   <Trash2 className="size-3.5" />
                                 </button>
@@ -312,7 +298,6 @@ function ExpenseDetailScreen() {
       })}
       {paymentLine && (
         <ExpensePaymentDialog
-          expenseId={id}
           line={paymentLine}
           onOpenChange={(open) => !open && setPaymentLine(null)}
         />

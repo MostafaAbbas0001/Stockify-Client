@@ -15,17 +15,6 @@ import { useI18n } from "@/i18n";
 import { employeesApi } from "@/lib/api/endpoints";
 
 export const Route = createFileRoute("/_app/employees/$employeeId")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Employee ${params.employeeId} — Stockify` },
-      {
-        name: "description",
-        content: "Stockify employee profile, branch assignment and sales performance.",
-      },
-      { property: "og:title", content: `Employee ${params.employeeId} — Stockify` },
-      { property: "og:description", content: "Employee details and sales summary in Stockify." },
-    ],
-  }),
   component: EmployeeDetailRoute,
 });
 function EmployeeDetailRoute() {
@@ -118,9 +107,7 @@ function Contact({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
-        <Icon className="size-4" />
-      </span>
+      <Icon className="mt-0.5 size-5 shrink-0 text-primary" />
       <div>
         <p className="text-xs text-muted-foreground">{label}</p>
         <p className="text-sm font-medium">{value}</p>

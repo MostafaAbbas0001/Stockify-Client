@@ -1,6 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, Boxes, CircleDollarSign, ReceiptText, ShoppingBasket } from "lucide-react";
+import {
+  AlertTriangle,
+  Boxes,
+  CircleDollarSign,
+  PackageX,
+  ReceiptText,
+  ShoppingBasket,
+} from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -13,9 +20,18 @@ import {
   YAxis,
 } from "recharts";
 
+import { AppSelect } from "@/components/common/AppSelect";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/DataStates";
 import { RequirePermission } from "@/components/common/RequirePermission";
-import { Card, CardHeader, TableShell, Td, Th } from "@/components/common/Surface";
+import {
+  Card,
+  CardHeader,
+  PageHeader,
+  StatCard,
+  TableShell,
+  Td,
+  Th,
+} from "@/components/common/Surface";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { TAB } from "@/features/auth/permissions";
 import { branchesQuery } from "@/features/reference/queries";
@@ -34,20 +50,6 @@ export const Route = createFileRoute("/_app/dashboard/")({
     from: typeof raw["from"] === "string" && raw["from"] ? raw["from"] : undefined,
     to: typeof raw["to"] === "string" && raw["to"] ? raw["to"] : undefined,
     branch: Number(raw["branch"]) > 0 ? Number(raw["branch"]) : undefined,
-  }),
-  head: () => ({
-    meta: [
-      { title: "Dashboard — Stockify" },
-      {
-        name: "description",
-        content: "Stockify sales, basket, outstanding balance and branch performance dashboard.",
-      },
-      { property: "og:title", content: "Dashboard — Stockify" },
-      {
-        property: "og:description",
-        content: "Retail performance and inventory health at a glance.",
-      },
-    ],
   }),
   component: DashboardRoute,
 });
@@ -186,72 +188,79 @@ function DashboardScreen() {
     value: point.subtotal,
   }));
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold">{t("dashboard.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("dashboard.subtitle")}</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <input
-            type="date"
-            value={start}
-            onChange={(event) => setFilters({ from: event.target.value || undefined })}
-            aria-label={t("common.from")}
-            className="h-10 rounded-lg border border-input bg-background px-2 text-sm"
-          />
-          <input
-            type="date"
-            value={end}
-            onChange={(event) => setFilters({ to: event.target.value || undefined })}
-            aria-label={t("common.to")}
-            className="h-10 rounded-lg border border-input bg-background px-2 text-sm"
-          />
-          {isAdmin && (
-            <select
-              value={branchId ?? ""}
-              onChange={(event) =>
-                setFilters({ branch: event.target.value ? Number(event.target.value) : undefined })
-              }
-              className="h-10 rounded-lg border border-input bg-background px-2 text-sm"
-            >
-              <option value="">{t("common.allBranches")}</option>
-              {(branches.data ?? []).map((branch) => (
-                <option key={branch.id} value={branch.id}>
-                  {branch.name}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <Kpi
+    <div className="space-y-6">
+      <PageHeader
+        title={t("dashboard.title")}
+        description={t("dashboard.subtitle")}
+        actions={
+          <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+            <input
+              type="date"
+              value={start}
+              onChange={(event) => setFilters({ from: event.target.value || undefined })}
+              aria-label={t("common.from")}
+              className="h-11 min-w-36 flex-1 rounded-xl border border-input bg-background px-3 text-sm shadow-sm sm:flex-none"
+            />
+            <input
+              type="date"
+              value={end}
+              onChange={(event) => setFilters({ to: event.target.value || undefined })}
+              aria-label={t("common.to")}
+              className="h-11 min-w-36 flex-1 rounded-xl border border-input bg-background px-3 text-sm shadow-sm sm:flex-none"
+            />
+            {isAdmin && (
+              <AppSelect
+                value={branchId ?? ""}
+                onChange={(event) =>
+                  setFilters({
+                    branch: event.target.value ? Number(event.target.value) : undefined,
+                  })
+                }
+                className="h-11 min-w-40 rounded-xl border border-input bg-background px-3 text-sm shadow-sm"
+              >
+                <option value="">{t("common.allBranches")}</option>
+                {(branches.data ?? []).map((branch) => (
+                  <option key={branch.id} value={branch.id}>
+                    {branch.name}
+                  </option>
+                ))}
+              </AppSelect>
+            )}
+          </div>
+        }
+      />
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
+        <StatCard
           icon={CircleDollarSign}
           label={t("dashboard.todaySales")}
           value={formatMoney(todaySales, locale)}
         />
-        <Kpi
+        <StatCard
           icon={CircleDollarSign}
           label={t("dashboard.periodSales")}
           value={formatMoney(periodSales, locale)}
         />
-        <Kpi
+        <StatCard
           icon={ReceiptText}
           label={t("dashboard.orders")}
           value={formatNumber(orderCount, locale)}
         />
-        <Kpi
+        <StatCard
           icon={ShoppingBasket}
           label={t("dashboard.averageBasket")}
           value={formatMoney(avgBasket, locale)}
         />
-        <Kpi icon={AlertTriangle} label={t("dashboard.outstanding")} value={outstanding} />
+        <StatCard
+          icon={AlertTriangle}
+          label={t("dashboard.outstanding")}
+          value={outstanding}
+          tone="warning"
+        />
       </div>
       <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
         <Card>
           <CardHeader title={t("dashboard.salesOverTime")} description={`${start} — ${end}`} />
-          <div className="h-72 p-4">
+          <div className="h-80 p-4 sm:p-5">
             {chartPoints.length === 0 ? (
               <EmptyState title={t("dashboard.noSales")} />
             ) : (
@@ -268,9 +277,29 @@ function DashboardScreen() {
                     vertical={false}
                     stroke="var(--color-border)"
                   />
-                  <XAxis dataKey="date" reversed={dir === "rtl"} tick={{ fontSize: 11 }} />
-                  <YAxis orientation={dir === "rtl" ? "right" : "left"} tick={{ fontSize: 11 }} />
-                  <Tooltip formatter={(value) => formatMoney(Number(value), locale)} />
+                  <XAxis
+                    dataKey="date"
+                    reversed={dir === "rtl"}
+                    tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    orientation={dir === "rtl" ? "right" : "left"}
+                    tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    formatter={(value) => formatMoney(Number(value), locale)}
+                    contentStyle={{
+                      background: "var(--color-popover)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: 12,
+                      color: "var(--color-popover-foreground)",
+                      boxShadow: "0 12px 30px oklch(0 0 0 / 0.12)",
+                    }}
+                  />
                   <Area
                     type="monotone"
                     dataKey="value"
@@ -285,7 +314,7 @@ function DashboardScreen() {
         </Card>
         <Card>
           <CardHeader title={t("dashboard.topProducts")} />
-          <div className="h-72 p-4">
+          <div className="h-80 p-4 sm:p-5">
             {(topProducts.data?.topProducts ?? []).length === 0 ? (
               <EmptyState title={t("dashboard.noProducts")} />
             ) : (
@@ -300,16 +329,32 @@ function DashboardScreen() {
                     horizontal={false}
                     stroke="var(--color-border)"
                   />
-                  <XAxis type="number" reversed={dir === "rtl"} tick={{ fontSize: 11 }} />
+                  <XAxis
+                    type="number"
+                    reversed={dir === "rtl"}
+                    tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
                   <YAxis
                     type="category"
                     dataKey="productName"
                     orientation={dir === "rtl" ? "right" : "left"}
                     width={90}
                     reversed={dir === "rtl"}
-                    tick={{ fontSize: 11 }}
+                    tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
+                    axisLine={false}
+                    tickLine={false}
                   />
-                  <Tooltip formatter={(value) => formatNumber(Number(value), locale)} />
+                  <Tooltip
+                    formatter={(value) => formatNumber(Number(value), locale)}
+                    contentStyle={{
+                      background: "var(--color-popover)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: 12,
+                      color: "var(--color-popover-foreground)",
+                    }}
+                  />
                   <Bar dataKey="quantitySold" fill="var(--color-primary)" radius={[4, 4, 4, 4]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -352,19 +397,16 @@ function DashboardScreen() {
               icon={AlertTriangle}
               label={t("dashboard.lowStock")}
               value={stock.data?.lowStockVariants.length ?? 0}
-              tone="warning"
             />
             <MiniStat
-              icon={Boxes}
+              icon={PackageX}
               label={t("dashboard.outOfStock")}
               value={stock.data?.outOfStockVariants.length ?? 0}
-              tone="error"
             />
             <MiniStat
               icon={ReceiptText}
               label={t("dashboard.expenseDrafts")}
               value={expenses.data?.draftedCount ?? 0}
-              tone="neutral"
             />
           </div>
         </Card>
@@ -373,45 +415,18 @@ function DashboardScreen() {
   );
 }
 
-function Kpi({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof CircleDollarSign;
-  label: string;
-  value: string;
-}) {
-  return (
-    <Card className="p-4">
-      <span className="mb-3 grid size-9 place-items-center rounded-lg bg-primary-soft text-primary">
-        <Icon className="size-4" />
-      </span>
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 truncate font-numeric text-xl font-semibold" title={value}>
-        {value}
-      </p>
-    </Card>
-  );
-}
 function MiniStat({
   icon: Icon,
   label,
   value,
-  tone,
 }: {
   icon: typeof Boxes;
   label: string;
   value: number;
-  tone: "warning" | "error" | "neutral";
 }) {
   return (
     <div className="flex items-center gap-3 rounded-lg border border-border p-3">
-      <span
-        className={`grid size-9 place-items-center rounded-lg ${tone === "warning" ? "bg-warning-soft text-warning" : tone === "error" ? "bg-error-soft text-destructive" : "bg-muted text-muted-foreground"}`}
-      >
-        <Icon className="size-4" />
-      </span>
+      <Icon className="size-5 shrink-0 text-primary" />
       <div>
         <p className="text-xs text-muted-foreground">{label}</p>
         <p className="font-numeric text-lg font-semibold">{value}</p>
