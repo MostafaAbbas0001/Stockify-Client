@@ -1,0 +1,415 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Stockify design system: DESIGN.md's structure with the Stockify brand layered on top.
+ * Kept from DESIGN.md: Geist, the canvas → sidebar → paper surface stack, hairline borders,
+ * 18px radius on everything interactive and 24px on containers, whisper shadows, no gradients,
+ * and red reserved for destructive actions and errors.
+ * Brand layer (from the logo): navy wordmark ink for text, brand blue for actions, selection,
+ * links, focus and charts, and a deep-navy dark theme. Never used as decoration.
+ */
+
+@theme inline {
+  --font-sans: var(--font-ui);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-strong: var(--primary-strong);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-navy: var(--navy);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--border);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--foreground);
+  --color-sidebar-border: var(--border);
+}
+
+@theme {
+  --radius-control: 18px;
+  --radius-surface: 24px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
+  --radius-xl: 18px;
+  --radius-2xl: 24px;
+  --radius-3xl: 24px;
+
+  --shadow-card:
+    0 0 0 1px rgb(23 23 23 / 0.05), 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-float: 0 0 0 1px rgb(23 23 23 / 0.05), 0 12px 32px -8px rgb(0 0 0 / 0.18);
+
+  --text-caption: 12px;
+  --text-caption--line-height: 1.33;
+  --text-body: 14px;
+  --text-body--line-height: 1.43;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 1.5;
+  --text-subheading: 18px;
+  --text-subheading--line-height: 1.56;
+  --text-heading-sm: 24px;
+  --text-heading-sm--line-height: 1.33;
+  --text-heading-sm--letter-spacing: -0.025em;
+  --text-heading: 30px;
+  --text-heading--line-height: 1.2;
+  --text-heading--letter-spacing: -0.025em;
+  --text-heading-lg: 36px;
+  --text-heading-lg--line-height: 1.11;
+  --text-heading-lg--letter-spacing: -0.025em;
+  --text-display: 48px;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.05em;
+}
+
+:root {
+  --font-ui:
+    "Geist", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
+
+  /* Canvas → sidebar → paper, with a faint cool tint so the blue sits naturally */
+  --background: #f4f6f9;
+  --sidebar: #fafbfd;
+  --card: #ffffff;
+
+  /* Text: the logo's navy wordmark ink */
+  --foreground: #0b1b3d;
+  --muted-foreground: #5b6576;
+
+  /* Filled actions: brand blue, deepened for AA with white text (5.4:1) */
+  --primary: #0062e6;
+  --primary-foreground: #ffffff;
+  /* Selected rows and nav items: soft blue band, blue text */
+  --primary-soft: #eaf2ff;
+  --primary-strong: #0057d9;
+
+  /* The logo's own colours: electric blue and navy */
+  --brand: #0a6cff;
+  --brand-foreground: #ffffff;
+  --navy: #00367e;
+  --logo-top: #00367e;
+  --logo-bottom: #0a6cff;
+
+  /* Input fills, secondary buttons, hover bands */
+  --muted: #eef2f7;
+  --accent: #e4eaf3;
+
+  --border: #e3e8ef;
+  --border-strong: #a8b3c4;
+  --ring: #0a6cff;
+
+  /* Destructive and error states only */
+  --destructive: #e7000b;
+  --destructive-foreground: #ffffff;
+}
+
+.dark {
+  /* Deep navy, like the brand's original dark theme */
+  --background: #070d19;
+  --sidebar: #0a1222;
+  --card: #0f1829;
+
+  --foreground: #e8eefb;
+  --muted-foreground: #8b9bb4;
+
+  --primary: #4d97ff;
+  --primary-foreground: #06101f;
+  --primary-soft: #13213a;
+  --primary-strong: #7fb2ff;
+
+  --brand: #4d97ff;
+  --brand-foreground: #06101f;
+  --navy: #9cc3ff;
+  --logo-top: #e8eefb;
+  --logo-bottom: #4d97ff;
+
+  --muted: #162238;
+  --accent: #1d2b45;
+
+  --border: #1e2a40;
+  --border-strong: #4a5a75;
+  --ring: #4d97ff;
+
+  --destructive: #ff5c63;
+  --destructive-foreground: #06101f;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+    scrollbar-color: color-mix(in oklab, var(--muted-foreground) 45%, transparent) transparent;
+    scrollbar-width: thin;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  *::-webkit-scrollbar {
+    width: 0.6rem;
+    height: 0.6rem;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    min-height: 2.5rem;
+    border: 0.16rem solid transparent;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--muted-foreground) 45%, transparent);
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  body {
+    min-width: 320px;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-ui);
+    font-feature-settings: "ss01", "cv11";
+    font-size: 14px;
+    line-height: 1.43;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 600;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--brand) 22%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Thin-stroke icons, per DESIGN.md (1.5–2px). */
+  svg.lucide {
+    stroke-width: 1.75;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--primary);
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+  }
+
+  button,
+  [role="button"],
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  [dir="rtl"] .rtl-flip {
+    transform: scaleX(-1);
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * Data tables restack into labelled rows on phones. TableShell copies each column
+ * header into its cells' data-label, so screens don't have to repeat the labels.
+ */
+@media (max-width: 767.98px) {
+  table[data-stack] > thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  table[data-stack],
+  table[data-stack] > tbody,
+  table[data-stack] > tfoot {
+    display: block;
+    width: 100%;
+  }
+
+  /* Each row becomes a block: the first cell is its title, the rest sit two per row. */
+  table[data-stack] > tbody > tr,
+  table[data-stack] > tfoot > tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  table[data-stack] > tbody > tr:last-child {
+    border-bottom: 0;
+  }
+
+  table[data-stack] > tfoot > tr {
+    border-top: 1px solid var(--color-border);
+    border-bottom: 0;
+  }
+
+  table[data-stack] > tbody > tr > td,
+  table[data-stack] > tfoot > tr > td {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
+    padding: 0;
+    border: 0;
+    text-align: start;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  table[data-stack] > tbody > tr > td::before,
+  table[data-stack] > tfoot > tr > td::before {
+    content: attr(data-label);
+    color: var(--color-muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+
+  table[data-stack] > tbody > tr > td:first-child {
+    grid-column: 1 / -1;
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  table[data-stack] > tbody > tr > td:first-child::before,
+  table[data-stack] > tbody > tr > td:not([data-label])::before,
+  table[data-stack] > tfoot > tr > td:not([data-label])::before {
+    content: none;
+  }
+
+  /* A field left alone on the last line takes the whole width instead of wrapping. */
+  table[data-stack] > tbody > tr > td:nth-child(even):last-child {
+    grid-column: 1 / -1;
+  }
+
+  /* Unlabelled cells hold row actions. */
+  table[data-stack] > tbody > tr > td:not([data-label]):not(:first-child) {
+    grid-column: 1 / -1;
+    align-items: flex-end;
+  }
+
+  table[data-stack] > tbody > tr > td[colspan] {
+    grid-column: 1 / -1;
+    align-items: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  [data-slot="sidebar"],
+  header,
+  nav,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .shadow-card,
+  .shadow-float {
+    box-shadow: none !important;
+  }
+}
+
+@media print and (max-width: 100mm) {
+  @page {
+    size: 80mm auto;
+    margin: 4mm;
+  }
+
+  body {
+    font-size: 10px;
+  }
+
+  table {
+    font-size: 9px;
+  }
+}

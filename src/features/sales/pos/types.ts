@@ -1,0 +1,22 @@
+export type PosItem = {
+  brandName: string | null;
+  productName: string;
+  imageUrl: string | null;
+  attributes: string[];
+  saleName: string | null;
+  sku: string;
+  productId: number;
+  variantId: number;
+  price: number;
+  subtotal: number;
+  saleDiscount: number;
+  stockQuantity: number;
+  barcode: string | null;
+  isSellable: boolean;
+  itemTax: number;
+  totalAmount: number;
+  saleTimeStart: string | null;
+  saleEndTime: string | null;
+  saleType: number | null;
+  saleValue: number | null;
+};

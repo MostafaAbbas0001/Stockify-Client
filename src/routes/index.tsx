@@ -1,0 +1,35 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
+
+import { firstPermittedRoute } from "@/app/layout/navigation";
+import { useAuth } from "@/features/auth/context/AuthContext";
+
+export const Route = createFileRoute("/")({
+  component: IndexRedirect,
+});
+
+/** Sends the visitor to sign-in or to the first screen their permissions allow. */
+function IndexRedirect() {
+  const { status, user, can } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "loading") return;
+    if (status === "anonymous" || !user) {
+      navigate({ to: "/login", replace: true });
+      return;
+    }
+    navigate({
+      to: user.permissions.length === 0 ? "/no-access" : firstPermittedRoute(can),
+      replace: true,
+    });
+  }, [status, user, can, navigate]);
+
+  return (
+    <div className="grid min-h-svh place-items-center bg-background">
+      <Loader2 className="size-5 animate-spin text-muted-foreground" />
+      <h1 className="sr-only">Stockify</h1>
+    </div>
+  );
+}
